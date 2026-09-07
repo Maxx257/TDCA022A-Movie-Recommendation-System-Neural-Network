@@ -1,0 +1,113 @@
+#root {
+  min-height: 100vh;
+}
+
+.app {
+  min-height: 100vh;
+  background: #101010;
+  color: white;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 6%;
+  background: #161616;
+}
+
+.logo {
+  margin: 0;
+  font-size: 22px;
+}
+
+.navbar nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.navbar a {
+  color: #dddddd;
+  text-decoration: none;
+}
+
+.navbar a:hover {
+  color: white;
+}
+
+.login-button,
+.primary-button,
+.secondary-button {
+  border: none;
+  border-radius: 6px;
+  padding: 11px 20px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.login-button,
+.primary-button {
+  background: #e50914;
+  color: white;
+}
+
+.secondary-button {
+  background: #333333;
+  color: white;
+}
+
+.hero {
+  min-height: calc(100vh - 78px);
+  display: flex;
+  align-items: center;
+  padding: 0 8%;
+}
+
+.hero-content {
+  max-width: 700px;
+}
+
+.tagline {
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: #bbbbbb;
+}
+
+.hero h2 {
+  margin: 16px 0;
+  font-size: clamp(40px, 7vw, 72px);
+  line-height: 1.05;
+}
+
+.description {
+  max-width: 620px;
+  font-size: 18px;
+  line-height: 1.7;
+  color: #cccccc;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+@media (max-width: 700px) {
+  .navbar {
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .navbar nav a {
+    display: none;
+  }
+
+  .hero {
+    padding: 40px 6%;
+  }
+
+  .hero h2 {
+    font-size: 44px;
+  }
+}
