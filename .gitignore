@@ -216,3 +216,44 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# =========================
+# React / Vite / Node
+# =========================
+node_modules/
+dist/
+.vite/
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Machine Learning models
+# =========================
+*.h5
+*.keras
+*.pkl
+*.pickle
+
+# =========================
+# Project datasets
+# =========================
+data/raw/
+data/processed/
+
+# =========================
+# IDE / OS
+# =========================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# =========================
+# Logs
+# =========================
+*.log
