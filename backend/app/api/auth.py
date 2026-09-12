@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-
+from app.core.auth import get_current_user
 from app.core.security import (
     create_access_token,
     hash_password,
@@ -122,3 +122,12 @@ def login_user(
         "access_token": access_token,
         "token_type": "bearer",
     }
+
+@router.get(
+    "/me",
+    response_model=UserResponse,
+)
+def get_logged_in_user(
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    return current_user
