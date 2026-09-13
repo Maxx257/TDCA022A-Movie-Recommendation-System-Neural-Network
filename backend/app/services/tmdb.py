@@ -77,6 +77,38 @@ def get_popular_movies(page: int = 1) -> dict:
         ],
     }
 
+def search_movies(
+    query: str,
+    page: int = 1,
+) -> dict:
+    url = f"{settings.tmdb_base_url}/search/movie"
+
+    response = httpx.get(
+        url,
+        headers=get_tmdb_headers(),
+        params={
+            "query": query,
+            "language": "en-US",
+            "page": page,
+            "include_adult": False,
+        },
+        timeout=10.0,
+    )
+
+    response.raise_for_status()
+
+    data = response.json()
+
+    return {
+        "page": data["page"],
+        "total_pages": data["total_pages"],
+        "total_results": data["total_results"],
+        "results": [
+            format_movie_summary(movie)
+            for movie in data["results"]
+        ],
+    }
+
 def format_cast_member(cast_member: dict) -> dict:
     return {
         "id": cast_member["id"],

@@ -43,12 +43,12 @@ useEffect(() => {
     Home
   </a>
 
-  <a
-    href="#"
-    className="hidden text-sm text-zinc-300 hover:text-white md:block"
-  >
-    Browse
-  </a>
+  <Link
+  to="/search"
+  className="hidden text-sm text-zinc-300 transition hover:text-white md:block"
+>
+  Search
+</Link>
 
   {user ? (
     <>
