@@ -1,10 +1,16 @@
+import { Link } from "react-router-dom";
+
+
 function MovieCard({ movie }) {
   const releaseYear = movie.release_date
     ? movie.release_date.slice(0, 4)
     : "N/A";
 
   return (
-    <article className="group overflow-hidden rounded-lg bg-zinc-900">
+    <Link
+      to={`/movies/${movie.id}`}
+      className="group block overflow-hidden rounded-lg bg-zinc-900 transition hover:-translate-y-1 hover:bg-zinc-800"
+    >
       <div className="aspect-[2/3] overflow-hidden bg-zinc-800">
         {movie.poster_url ? (
           <img
@@ -27,14 +33,12 @@ function MovieCard({ movie }) {
 
         <div className="mt-2 flex items-center justify-between text-sm text-zinc-400">
           <span>{releaseYear}</span>
-
-          <span>
-            ★ {movie.vote_average.toFixed(1)}
-          </span>
+          <span>★ {movie.vote_average.toFixed(1)}</span>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }
+
 
 export default MovieCard;

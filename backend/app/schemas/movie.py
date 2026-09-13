@@ -20,3 +20,24 @@ class MovieListResponse(BaseModel):
     total_pages: int
     total_results: int
     results: list[MovieSummary]
+
+class CastMember(BaseModel):
+    id: int
+    name: str
+    character: str
+    profile_url: str | None
+
+
+class MovieDetails(BaseModel):
+    id: int
+    title: str
+    overview: str
+    poster_url: str | None
+    backdrop_url: str | None
+    release_date: str | None
+    vote_average: float
+    vote_count: int
+    runtime: int | None
+    original_language: str
+    genres: list[str]
+    cast: list[CastMember]

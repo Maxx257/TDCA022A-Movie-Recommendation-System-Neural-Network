@@ -12,6 +12,7 @@ import App from "./App.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
+import MovieDetails from "./pages/MovieDetails.jsx";
 
 
 createRoot(document.getElementById("root")).render(
@@ -22,6 +23,10 @@ createRoot(document.getElementById("root")).render(
           <Route path="/" element={<App />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route
+  path="/movies/:movieId"
+  element={<MovieDetails />}
+/>
         </Routes>
       </AuthProvider>
     </BrowserRouter>

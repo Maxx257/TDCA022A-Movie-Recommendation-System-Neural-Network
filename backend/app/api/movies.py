@@ -1,8 +1,8 @@
 import httpx
 from fastapi import APIRouter, HTTPException, Query
 
-from app.schemas.movie import MovieListResponse
-from app.services.tmdb import get_popular_movies
+from app.schemas.movie import MovieDetails, MovieListResponse
+from app.services.tmdb import get_movie_details, get_popular_movies
 
 
 router = APIRouter(
@@ -22,6 +22,33 @@ def popular_movies(
         return get_popular_movies(page)
 
     except httpx.HTTPStatusError:
+        raise HTTPException(
+            status_code=502,
+            detail="TMDB returned an error",
+        )
+
+    except httpx.RequestError:
+        raise HTTPException(
+            status_code=503,
+            detail="Could not connect to TMDB",
+        )
+
+
+@router.get(
+    "/{movie_id}",
+    response_model=MovieDetails,
+)
+def movie_details(movie_id: int):
+    try:
+        return get_movie_details(movie_id)
+
+    except httpx.HTTPStatusError as error:
+        if error.response.status_code == 404:
+            raise HTTPException(
+                status_code=404,
+                detail="Movie not found",
+            )
+
         raise HTTPException(
             status_code=502,
             detail="TMDB returned an error",
