@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-
+import { Link, useNavigate, useParams } from "react-router-dom";
 import apiClient from "../api/client";
+import { useAuth } from "../context/AuthContext";
 
 
 function MovieDetails() {
   const { movieId } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
 
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -36,6 +40,64 @@ function MovieDetails() {
     loadMovie();
   }, [movieId]);
 
+  useEffect(() => {
+  const loadFavoriteStatus = async () => {
+    if (!user) {
+      setIsFavorite(false);
+      return;
+    }
+
+    try {
+      const response = await apiClient.get(
+        `/favorites/${movieId}/status`
+      );
+
+      setIsFavorite(response.data.is_favorite);
+    } catch (error) {
+      console.error(
+        "Could not load favorite status:",
+        error
+      );
+    }
+  };
+
+  loadFavoriteStatus();
+}, [movieId, user]);
+
+const handleFavorite = async () => {
+  if (!user) {
+    navigate("/login");
+    return;
+  }
+
+  setFavoriteLoading(true);
+
+  try {
+    if (isFavorite) {
+      await apiClient.delete(
+        `/favorites/${movie.id}`
+      );
+
+      setIsFavorite(false);
+    } else {
+      await apiClient.post(
+        "/favorites",
+        {
+          movie_id: movie.id,
+        }
+      );
+
+      setIsFavorite(true);
+    }
+  } catch (error) {
+    console.error(
+      "Could not update favorite:",
+      error
+    );
+  } finally {
+    setFavoriteLoading(false);
+  }
+};
 
   if (loading) {
     return (
@@ -136,6 +198,24 @@ function MovieDetails() {
                 </span>
               ))}
             </div>
+            <div className="mt-6">
+  <button
+    type="button"
+    onClick={handleFavorite}
+    disabled={favoriteLoading}
+    className={
+      isFavorite
+        ? "rounded-md bg-red-600 px-6 py-3 font-semibold transition hover:bg-red-700 disabled:opacity-50"
+        : "rounded-md bg-zinc-800 px-6 py-3 font-semibold transition hover:bg-zinc-700 disabled:opacity-50"
+    }
+  >
+    {favoriteLoading
+      ? "Updating..."
+      : isFavorite
+        ? "♥ Favourited"
+        : "♡ Add to Favourites"}
+  </button>
+</div>
 
             <h2 className="mt-8 text-xl font-semibold">
               Overview
