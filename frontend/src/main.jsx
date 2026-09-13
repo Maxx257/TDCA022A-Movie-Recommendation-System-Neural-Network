@@ -15,6 +15,7 @@ import Register from "./pages/Register.jsx";
 import MovieDetails from "./pages/MovieDetails.jsx";
 import Search from "./pages/Search.jsx";
 import Browse from "./pages/Browse.jsx";
+import MyList from "./pages/MyList.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -26,6 +27,7 @@ createRoot(document.getElementById("root")).render(
 />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+            <Route path="/my-list" element={<MyList />} />
           <Route path="/search"element={<Search />}
 />
           <Route

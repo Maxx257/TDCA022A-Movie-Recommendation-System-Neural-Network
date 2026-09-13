@@ -59,6 +59,14 @@ useEffect(() => {
 
   {user ? (
     <>
+    
+    <Link
+  to="/my-list"
+  className="hidden text-sm text-zinc-300 transition hover:text-white md:block"
+>
+  My List
+</Link>
+
       <span className="text-sm text-zinc-300">
         {user.username}
       </span>
