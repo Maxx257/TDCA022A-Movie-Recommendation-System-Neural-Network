@@ -1,3 +1,7 @@
+from app.models.favorite import Favorite
 from app.models.user import User
 
-__all__ = ["User"]
+__all__ = [
+    "Favorite",
+    "User",
+]

@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.database import engine
 from app.api.auth import router as auth_router
 from app.api.movies import router as movies_router
+from app.api.favorites import router as favorites_router
 
 app = FastAPI(
     title="Movie Recommendation System API",
@@ -28,6 +29,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(movies_router)
+app.include_router(favorites_router)
 
 @app.get("/")
 def root():
