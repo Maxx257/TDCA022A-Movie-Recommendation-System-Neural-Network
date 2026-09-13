@@ -190,6 +190,8 @@ def get_movie_genres() -> dict:
 def discover_movies(
     page: int = 1,
     genre_id: int | None = None,
+    year: int | None = None,
+    min_rating: float | None = None,
 ) -> dict:
     url = f"{settings.tmdb_base_url}/discover/movie"
 
@@ -202,6 +204,12 @@ def discover_movies(
 
     if genre_id is not None:
         params["with_genres"] = genre_id
+
+    if year is not None:
+        params["primary_release_year"] = year
+
+    if min_rating is not None:
+        params["vote_average.gte"] = min_rating
 
     response = httpx.get(
         url,

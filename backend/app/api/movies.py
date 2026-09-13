@@ -93,14 +93,27 @@ def movie_genres():
     "/discover",
     response_model=MovieListResponse,
 )
+@router.get(
+    "/discover",
+    response_model=MovieListResponse,
+)
+
 def movie_discover(
     genre_id: int | None = Query(default=None, ge=1),
+    year: int | None = Query(default=None, ge=1900),
+    min_rating: float | None = Query(
+        default=None,
+        ge=0,
+        le=10,
+    ),
     page: int = Query(default=1, ge=1),
 ):
     try:
         return discover_movies(
             page=page,
             genre_id=genre_id,
+            year=year,
+            min_rating=min_rating,
         )
 
     except httpx.HTTPStatusError:
@@ -114,7 +127,7 @@ def movie_discover(
             status_code=503,
             detail="Could not connect to TMDB",
         )
-
+    
 @router.get(
     "/{movie_id}",
     response_model=MovieDetails,
