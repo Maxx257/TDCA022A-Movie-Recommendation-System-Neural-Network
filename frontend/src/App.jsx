@@ -1,7 +1,10 @@
+import { Link } from "react-router-dom";
+
+
 function App() {
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      <header className="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-6 py-5 md:px-12">
+      <header className="flex items-center justify-between border-b border-zinc-800 px-6 py-5 md:px-12">
         <h1 className="text-xl font-bold tracking-tight md:text-2xl">
           Movie Recommendation System
         </h1>
@@ -9,28 +12,31 @@ function App() {
         <nav className="flex items-center gap-5">
           <a
             href="#"
-            className="hidden text-sm text-zinc-300 transition hover:text-white sm:block"
+            className="hidden text-sm text-zinc-300 hover:text-white sm:block"
           >
             Home
           </a>
 
           <a
             href="#"
-            className="hidden text-sm text-zinc-300 transition hover:text-white sm:block"
+            className="hidden text-sm text-zinc-300 hover:text-white sm:block"
           >
             Browse
           </a>
 
           <a
             href="#"
-            className="hidden text-sm text-zinc-300 transition hover:text-white md:block"
+            className="hidden text-sm text-zinc-300 hover:text-white md:block"
           >
             My List
           </a>
 
-          <button className="rounded-md bg-red-600 px-5 py-2 text-sm font-semibold transition hover:bg-red-700">
-            Login
-          </button>
+          <Link
+            to="/register"
+            className="rounded-md bg-red-600 px-5 py-2 text-sm font-semibold transition hover:bg-red-700"
+          >
+            Register
+          </Link>
         </nav>
       </header>
 
@@ -40,7 +46,7 @@ function App() {
             NEURAL NETWORK POWERED RECOMMENDATIONS
           </p>
 
-          <h2 className="max-w-3xl text-4xl font-bold leading-tight sm:text-5xl md:text-6xl lg:text-7xl">
+          <h2 className="text-4xl font-bold leading-tight sm:text-5xl md:text-6xl lg:text-7xl">
             Discover movies made for you.
           </h2>
 
@@ -49,10 +55,13 @@ function App() {
             recommendations based on your interests.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <button className="rounded-md bg-red-600 px-6 py-3 font-semibold transition hover:bg-red-700">
-              Explore Movies
-            </button>
+          <div className="mt-8 flex gap-3">
+            <Link
+              to="/register"
+              className="rounded-md bg-red-600 px-6 py-3 font-semibold transition hover:bg-red-700"
+            >
+              Get Started
+            </Link>
 
             <button className="rounded-md bg-zinc-800 px-6 py-3 font-semibold transition hover:bg-zinc-700">
               Learn More
@@ -63,5 +72,6 @@ function App() {
     </div>
   );
 }
+
 
 export default App;
