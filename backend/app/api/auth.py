@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from app.core.auth import get_current_user
@@ -36,16 +36,16 @@ def register_user(
     db: Annotated[Session, Depends(get_db)],
 ):
     existing_user = db.scalar(
-        select(User).where(
-            or_(
-                User.username == user_data.username,
-                User.email == user_data.email,
-            )
+    select(User).where(
+        or_(
+            func.lower(User.username) == user_data.username.lower(),
+            func.lower(User.email) == user_data.email.lower(),
         )
     )
+)
 
     if existing_user:
-        if existing_user.username == user_data.username:
+        if existing_user.username.lower() == user_data.username.lower():
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Username is already registered",
@@ -57,10 +57,10 @@ def register_user(
         )
 
     new_user = User(
-        username=user_data.username,
-        email=user_data.email,
-        hashed_password=hash_password(user_data.password),
-    )
+    username=user_data.username.strip(),
+    email=user_data.email.lower().strip(),
+    hashed_password=hash_password(user_data.password),
+)
 
     db.add(new_user)
 
@@ -86,11 +86,13 @@ def login_user(
     login_data: UserLogin,
     db: Annotated[Session, Depends(get_db)],
 ):
+    identifier = login_data.identifier.strip().lower()
+
     user = db.scalar(
         select(User).where(
             or_(
-                User.username == login_data.identifier,
-                User.email == login_data.identifier,
+                func.lower(User.username) == identifier,
+                func.lower(User.email) == identifier,
             )
         )
     )

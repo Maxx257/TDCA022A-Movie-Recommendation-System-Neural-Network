@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 
+import { useAuth } from "./context/AuthContext";
+
 
 function App() {
+  const { user, logout } = useAuth();
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
       <header className="flex items-center justify-between border-b border-zinc-800 px-6 py-5 md:px-12">
@@ -9,35 +12,52 @@ function App() {
           Movie Recommendation System
         </h1>
 
-        <nav className="flex items-center gap-5">
-          <a
-            href="#"
-            className="hidden text-sm text-zinc-300 hover:text-white sm:block"
-          >
-            Home
-          </a>
+        <nav className="flex items-center gap-4">
+  <a
+    href="#"
+    className="hidden text-sm text-zinc-300 hover:text-white sm:block"
+  >
+    Home
+  </a>
 
-          <a
-            href="#"
-            className="hidden text-sm text-zinc-300 hover:text-white sm:block"
-          >
-            Browse
-          </a>
+  <a
+    href="#"
+    className="hidden text-sm text-zinc-300 hover:text-white md:block"
+  >
+    Browse
+  </a>
 
-          <a
-            href="#"
-            className="hidden text-sm text-zinc-300 hover:text-white md:block"
-          >
-            My List
-          </a>
+  {user ? (
+    <>
+      <span className="text-sm text-zinc-300">
+        {user.username}
+      </span>
 
-          <Link
-            to="/register"
-            className="rounded-md bg-red-600 px-5 py-2 text-sm font-semibold transition hover:bg-red-700"
-          >
-            Register
-          </Link>
-        </nav>
+      <button
+        onClick={logout}
+        className="rounded-md bg-zinc-800 px-5 py-2 text-sm font-semibold transition hover:bg-zinc-700"
+      >
+        Logout
+      </button>
+    </>
+  ) : (
+    <>
+      <Link
+        to="/login"
+        className="text-sm text-zinc-300 hover:text-white"
+      >
+        Login
+      </Link>
+
+      <Link
+        to="/register"
+        className="rounded-md bg-red-600 px-5 py-2 text-sm font-semibold transition hover:bg-red-700"
+      >
+        Register
+      </Link>
+    </>
+  )}
+</nav>
       </header>
 
       <main className="flex min-h-[calc(100vh-81px)] items-center px-6 py-16 md:px-16 lg:px-24">
