@@ -169,3 +169,57 @@ def get_movie_details(movie_id: int) -> dict:
             for member in cast[:10]
         ],
     }
+
+def get_movie_genres() -> dict:
+    url = f"{settings.tmdb_base_url}/genre/movie/list"
+
+    response = httpx.get(
+        url,
+        headers=get_tmdb_headers(),
+        params={
+            "language": "en-US",
+        },
+        timeout=10.0,
+    )
+
+    response.raise_for_status()
+
+    return response.json()
+
+
+def discover_movies(
+    page: int = 1,
+    genre_id: int | None = None,
+) -> dict:
+    url = f"{settings.tmdb_base_url}/discover/movie"
+
+    params = {
+        "language": "en-US",
+        "page": page,
+        "include_adult": False,
+        "sort_by": "popularity.desc",
+    }
+
+    if genre_id is not None:
+        params["with_genres"] = genre_id
+
+    response = httpx.get(
+        url,
+        headers=get_tmdb_headers(),
+        params=params,
+        timeout=10.0,
+    )
+
+    response.raise_for_status()
+
+    data = response.json()
+
+    return {
+        "page": data["page"],
+        "total_pages": data["total_pages"],
+        "total_results": data["total_results"],
+        "results": [
+            format_movie_summary(movie)
+            for movie in data["results"]
+        ],
+    }

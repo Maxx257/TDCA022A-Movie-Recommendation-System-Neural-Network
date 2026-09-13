@@ -44,6 +44,13 @@ useEffect(() => {
   </a>
 
   <Link
+  to="/browse"
+  className="hidden text-sm text-zinc-300 transition hover:text-white sm:block"
+>
+  Browse
+</Link>
+
+  <Link
   to="/search"
   className="hidden text-sm text-zinc-300 transition hover:text-white md:block"
 >

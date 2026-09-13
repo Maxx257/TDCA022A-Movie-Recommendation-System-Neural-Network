@@ -41,3 +41,11 @@ class MovieDetails(BaseModel):
     original_language: str
     genres: list[str]
     cast: list[CastMember]
+
+class Genre(BaseModel):
+    id: int
+    name: str
+
+
+class GenreListResponse(BaseModel):
+    genres: list[Genre]

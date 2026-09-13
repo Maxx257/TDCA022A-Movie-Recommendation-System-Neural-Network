@@ -1,13 +1,18 @@
 import httpx
 from fastapi import APIRouter, HTTPException, Query
 
-from app.schemas.movie import MovieDetails, MovieListResponse
+from app.schemas.movie import (
+    GenreListResponse,
+    MovieDetails,
+    MovieListResponse,
+)
 from app.services.tmdb import (
+    discover_movies,
     get_movie_details,
+    get_movie_genres,
     get_popular_movies,
     search_movies,
 )
-
 
 router = APIRouter(
     prefix="/movies",
@@ -49,6 +54,53 @@ def movie_search(
         return search_movies(
             query=query,
             page=page,
+        )
+
+    except httpx.HTTPStatusError:
+        raise HTTPException(
+            status_code=502,
+            detail="TMDB returned an error",
+        )
+
+    except httpx.RequestError:
+        raise HTTPException(
+            status_code=503,
+            detail="Could not connect to TMDB",
+        )
+
+@router.get(
+    "/genres",
+    response_model=GenreListResponse,
+)
+def movie_genres():
+    try:
+        return get_movie_genres()
+
+    except httpx.HTTPStatusError:
+        raise HTTPException(
+            status_code=502,
+            detail="TMDB returned an error",
+        )
+
+    except httpx.RequestError:
+        raise HTTPException(
+            status_code=503,
+            detail="Could not connect to TMDB",
+        )
+
+
+@router.get(
+    "/discover",
+    response_model=MovieListResponse,
+)
+def movie_discover(
+    genre_id: int | None = Query(default=None, ge=1),
+    page: int = Query(default=1, ge=1),
+):
+    try:
+        return discover_movies(
+            page=page,
+            genre_id=genre_id,
         )
 
     except httpx.HTTPStatusError:
