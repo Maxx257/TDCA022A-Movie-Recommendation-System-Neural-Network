@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import apiClient from "./api/client";
 import MovieCard from "./components/MovieCard";
 import TopPicks from "./components/TopPicks";
+import BecauseYouLiked from "./components/BecauseYouLiked";
 
 function App() {
   const { user, logout } = useAuth();
@@ -129,6 +130,7 @@ useEffect(() => {
         </section>
       </main>
       <TopPicks />
+      <BecauseYouLiked />
       <RecentlyViewed />
       <section className="px-6 pb-16 md:px-16 lg:px-24">
   <div className="mb-6 flex items-center justify-between">
