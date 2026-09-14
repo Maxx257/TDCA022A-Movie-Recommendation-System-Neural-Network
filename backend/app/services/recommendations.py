@@ -6,6 +6,7 @@ from app.models.favorite import Favorite
 from app.models.rating import Rating
 from app.models.view_history import ViewHistory
 from app.services.tmdb import (
+    get_movie_details,
     get_movie_recommendations,
     get_popular_movies,
 )
@@ -145,3 +146,86 @@ def get_personalized_recommendations(
         ][:limit]
 
     return final_movies
+
+def get_because_you_liked(
+    user_id: int,
+    db: Session,
+    limit: int = 6,
+) -> dict:
+
+    favorite = db.scalar(
+        select(Favorite)
+        .where(
+            Favorite.user_id == user_id
+        )
+        .order_by(
+            Favorite.created_at.desc()
+        )
+    )
+
+    if favorite is None:
+        return {
+            "seed_movie_id": None,
+            "seed_title": None,
+            "results": [],
+        }
+
+    seed_movie_id = favorite.movie_id
+
+    seed_details = get_movie_details(
+        seed_movie_id
+    )
+
+    interacted_movie_ids: set[int] = set()
+
+    favorites = db.scalars(
+        select(Favorite).where(
+            Favorite.user_id == user_id
+        )
+    ).all()
+
+    ratings = db.scalars(
+        select(Rating).where(
+            Rating.user_id == user_id
+        )
+    ).all()
+
+    history = db.scalars(
+        select(ViewHistory).where(
+            ViewHistory.user_id == user_id
+        )
+    ).all()
+
+    interacted_movie_ids.update(
+        item.movie_id
+        for item in favorites
+    )
+
+    interacted_movie_ids.update(
+        item.movie_id
+        for item in ratings
+    )
+
+    interacted_movie_ids.update(
+        item.movie_id
+        for item in history
+    )
+
+    recommendation_data = (
+        get_movie_recommendations(
+            seed_movie_id
+        )
+    )
+
+    recommendations = [
+        movie
+        for movie in recommendation_data["results"]
+        if movie["id"]
+        not in interacted_movie_ids
+    ][:limit]
+
+    return {
+        "seed_movie_id": seed_movie_id,
+        "seed_title": seed_details["title"],
+        "results": recommendations,
+    }
