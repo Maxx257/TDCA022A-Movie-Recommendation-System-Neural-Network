@@ -239,3 +239,36 @@ def discover_movies(
             for movie in data["results"]
         ],
     }
+
+def get_movie_recommendations(
+    movie_id: int,
+    page: int = 1,
+) -> dict:
+    url = (
+        f"{settings.tmdb_base_url}"
+        f"/movie/{movie_id}/recommendations"
+    )
+
+    response = httpx.get(
+        url,
+        headers=get_tmdb_headers(),
+        params={
+            "language": "en-US",
+            "page": page,
+        },
+        timeout=10.0,
+    )
+
+    response.raise_for_status()
+
+    data = response.json()
+
+    return {
+        "page": data["page"],
+        "total_pages": data["total_pages"],
+        "total_results": data["total_results"],
+        "results": [
+            format_movie_summary(movie)
+            for movie in data["results"]
+        ],
+    }

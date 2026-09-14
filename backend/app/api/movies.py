@@ -10,6 +10,7 @@ from app.services.tmdb import (
     discover_movies,
     get_movie_details,
     get_movie_genres,
+    get_movie_recommendations,
     get_popular_movies,
     search_movies,
 )
@@ -125,7 +126,34 @@ def movie_discover(
             status_code=503,
             detail="Could not connect to TMDB",
         )
-        
+
+@router.get(
+    "/{movie_id}/recommendations",
+    response_model=MovieListResponse,
+)
+def movie_recommendations(movie_id: int):
+    try:
+        return get_movie_recommendations(movie_id)
+
+    except httpx.HTTPStatusError as error:
+        if error.response.status_code == 404:
+            raise HTTPException(
+                status_code=404,
+                detail="Movie not found",
+            )
+
+        raise HTTPException(
+            status_code=502,
+            detail="TMDB returned an error",
+        )
+
+    except httpx.RequestError:
+        raise HTTPException(
+            status_code=503,
+            detail="Could not connect to TMDB",
+        )
+
+
 @router.get(
     "/{movie_id}",
     response_model=MovieDetails,
