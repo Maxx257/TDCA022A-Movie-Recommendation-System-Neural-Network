@@ -257,3 +257,6 @@ Thumbs.db
 # Logs
 # =========================
 *.log
+
+ml/.venv/
+ml/artifacts/
