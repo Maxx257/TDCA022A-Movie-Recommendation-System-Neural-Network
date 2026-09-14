@@ -1,10 +1,10 @@
+import RecentlyViewed from "./components/RecentlyViewed";
 import { useAuth } from "./context/AuthContext";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import apiClient from "./api/client";
 import MovieCard from "./components/MovieCard";
-
 
 function App() {
   const { user, logout } = useAuth();
@@ -127,6 +127,7 @@ useEffect(() => {
           </div>
         </section>
       </main>
+      <RecentlyViewed />
       <section className="px-6 pb-16 md:px-16 lg:px-24">
   <div className="mb-6 flex items-center justify-between">
     <div>
