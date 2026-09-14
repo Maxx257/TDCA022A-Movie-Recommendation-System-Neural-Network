@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import apiClient from "../api/client";
 import { useAuth } from "../context/AuthContext";
@@ -17,7 +17,7 @@ function MovieDetails() {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const recordedMovieRef = useRef(null);
 
   useEffect(() => {
     const loadMovie = async () => {
@@ -58,8 +58,10 @@ function MovieDetails() {
       setUserRating(response.data.rating);
 
       if (response.data.rating !== null) {
-        setSelectedRating(response.data.rating);
-      }
+  setSelectedRating(response.data.rating);
+} else {
+  setSelectedRating(3);
+}
     } catch (error) {
       console.error(
         "Could not load user rating:",
@@ -70,6 +72,35 @@ function MovieDetails() {
 
   loadUserRating();
 }, [movieId, user]);
+
+useEffect(() => {
+  const recordMovieView = async () => {
+    if (!user || !movie) {
+      return;
+    }
+
+    const historyKey = `${user.id}-${movie.id}`;
+
+    if (recordedMovieRef.current === historyKey) {
+      return;
+    }
+
+    recordedMovieRef.current = historyKey;
+
+    try {
+      await apiClient.post(
+        `/history/${movie.id}`
+      );
+    } catch (error) {
+      console.error(
+        "Could not record movie view:",
+        error
+      );
+    }
+  };
+
+  recordMovieView();
+}, [movie, user]);
 
   useEffect(() => {
   const loadFavoriteStatus = async () => {
