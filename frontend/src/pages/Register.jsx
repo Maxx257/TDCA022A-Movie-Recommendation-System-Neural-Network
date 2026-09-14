@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import apiClient from "../api/client";
-
+import { useAuth } from "../context/AuthContext";
 
 function Register() {
   const navigate = useNavigate();
-
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -38,11 +38,16 @@ function Register() {
     try {
       await apiClient.post("/auth/register", formData);
 
-      setSuccess("Account created successfully.");
+await login(
+  formData.username,
+  formData.password
+);
 
-      setTimeout(() => {
-        navigate("/");
-      }, 1200);
+setSuccess("Account created successfully.");
+
+setTimeout(() => {
+  navigate("/preferences");
+}, 800);
     } catch (error) {
       const message =
         error.response?.data?.detail ||
