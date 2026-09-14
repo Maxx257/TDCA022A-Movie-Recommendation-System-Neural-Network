@@ -10,6 +10,9 @@ function MovieDetails() {
   const { user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [userRating, setUserRating] = useState(null);
+  const [selectedRating, setSelectedRating] = useState(3);
+  const [ratingLoading, setRatingLoading] = useState(false);
 
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -39,6 +42,34 @@ function MovieDetails() {
 
     loadMovie();
   }, [movieId]);
+
+  useEffect(() => {
+  const loadUserRating = async () => {
+    if (!user) {
+      setUserRating(null);
+      return;
+    }
+
+    try {
+      const response = await apiClient.get(
+        `/ratings/${movieId}`
+      );
+
+      setUserRating(response.data.rating);
+
+      if (response.data.rating !== null) {
+        setSelectedRating(response.data.rating);
+      }
+    } catch (error) {
+      console.error(
+        "Could not load user rating:",
+        error
+      );
+    }
+  };
+
+  loadUserRating();
+}, [movieId, user]);
 
   useEffect(() => {
   const loadFavoriteStatus = async () => {
@@ -96,6 +127,67 @@ const handleFavorite = async () => {
     );
   } finally {
     setFavoriteLoading(false);
+  }
+};
+
+const handleSaveRating = async () => {
+  if (!user) {
+    navigate("/login");
+    return;
+  }
+
+  setRatingLoading(true);
+
+  try {
+    if (userRating === null) {
+      await apiClient.post(
+        "/ratings",
+        {
+          movie_id: movie.id,
+          rating: selectedRating,
+        }
+      );
+    } else {
+      await apiClient.put(
+        `/ratings/${movie.id}`,
+        {
+          rating: selectedRating,
+        }
+      );
+    }
+
+    setUserRating(selectedRating);
+  } catch (error) {
+    console.error(
+      "Could not save rating:",
+      error
+    );
+  } finally {
+    setRatingLoading(false);
+  }
+};
+
+const handleRemoveRating = async () => {
+  if (!user || userRating === null) {
+    return;
+  }
+
+  setRatingLoading(true);
+
+  try {
+    await apiClient.delete(
+      `/ratings/${movie.id}`
+    );
+
+    setUserRating(null);
+    setSelectedRating(3);
+  } catch (error) {
+    console.error(
+      "Could not remove rating:",
+      error
+    );
+  } finally {
+    setRatingLoading(false);
   }
 };
 
@@ -215,6 +307,75 @@ const handleFavorite = async () => {
         ? "♥ Favourited"
         : "♡ Add to Favourites"}
   </button>
+</div>
+<div className="mt-6 max-w-md rounded-lg border border-zinc-800 bg-zinc-900/80 p-5">
+  <h3 className="font-semibold">
+    Your Rating
+  </h3>
+
+  <p className="mt-1 text-sm text-zinc-400">
+    Rate this movie from 0.5 to 5 stars.
+  </p>
+
+  {userRating !== null && (
+    <p className="mt-3 text-sm text-yellow-400">
+      Your current rating: ★ {userRating.toFixed(1)} / 5
+    </p>
+  )}
+
+  <div className="mt-4 flex flex-wrap gap-2">
+    {[
+      0.5,
+      1,
+      1.5,
+      2,
+      2.5,
+      3,
+      3.5,
+      4,
+      4.5,
+      5,
+    ].map((rating) => (
+      <button
+        key={rating}
+        type="button"
+        onClick={() => setSelectedRating(rating)}
+        className={
+          selectedRating === rating
+            ? "rounded-md bg-red-600 px-3 py-2 text-sm font-semibold"
+            : "rounded-md bg-zinc-800 px-3 py-2 text-sm font-semibold transition hover:bg-zinc-700"
+        }
+      >
+        {rating} ★
+      </button>
+    ))}
+  </div>
+
+  <div className="mt-4 flex flex-wrap gap-3">
+    <button
+      type="button"
+      onClick={handleSaveRating}
+      disabled={ratingLoading}
+      className="rounded-md bg-red-600 px-5 py-2 font-semibold transition hover:bg-red-700 disabled:opacity-50"
+    >
+      {ratingLoading
+        ? "Saving..."
+        : userRating === null
+          ? "Save Rating"
+          : "Update Rating"}
+    </button>
+
+    {userRating !== null && (
+      <button
+        type="button"
+        onClick={handleRemoveRating}
+        disabled={ratingLoading}
+        className="rounded-md bg-zinc-800 px-5 py-2 font-semibold transition hover:bg-zinc-700 disabled:opacity-50"
+      >
+        Remove Rating
+      </button>
+    )}
+  </div>
 </div>
 
             <h2 className="mt-8 text-xl font-semibold">
