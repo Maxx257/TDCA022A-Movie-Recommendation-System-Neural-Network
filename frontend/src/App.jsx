@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 
 import apiClient from "./api/client";
 import MovieCard from "./components/MovieCard";
+import TopPicks from "./components/TopPicks";
 
 function App() {
   const { user, logout } = useAuth();
@@ -127,6 +128,7 @@ useEffect(() => {
           </div>
         </section>
       </main>
+      <TopPicks />
       <RecentlyViewed />
       <section className="px-6 pb-16 md:px-16 lg:px-24">
   <div className="mb-6 flex items-center justify-between">
