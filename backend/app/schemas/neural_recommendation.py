@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class NeuralRecommendationItem(BaseModel):
     tmdb_id: int
-    score: float
+    score: float | None = None
 
 
 class NeuralRecommendationResponse(BaseModel):

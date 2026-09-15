@@ -129,14 +129,52 @@ def neural_recommendations(
     ),
 ):
     try:
-        return get_neural_recommendations(
+        neural_result = get_neural_recommendations(
             user_id=current_user.id,
             db=db,
             limit=limit,
         )
 
+        if neural_result["results"]:
+            return neural_result
+
+        fallback_movies = (
+            get_personalized_recommendations(
+                user_id=current_user.id,
+                db=db,
+                limit=limit,
+            )
+        )
+
+        return {
+            "strategy": "personalized_fallback",
+            "profile_interactions":
+                neural_result[
+                    "profile_interactions"
+                ],
+            "results": [
+                {
+                    "tmdb_id": movie["id"],
+                    "score": None,
+                }
+                for movie in fallback_movies
+            ],
+        }
+
     except FileNotFoundError as error:
         raise HTTPException(
             status_code=503,
             detail=str(error),
+        )
+
+    except httpx.HTTPStatusError:
+        raise HTTPException(
+            status_code=502,
+            detail="TMDB returned an error",
+        )
+
+    except httpx.RequestError:
+        raise HTTPException(
+            status_code=503,
+            detail="Could not connect to TMDB",
         )
