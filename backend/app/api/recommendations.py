@@ -205,14 +205,59 @@ def hybrid_recommendations(
     ),
 ):
     try:
-        return get_hybrid_recommendations(
+        hybrid_result = get_hybrid_recommendations(
             user_id=current_user.id,
             db=db,
             limit=limit,
         )
 
+        if hybrid_result["results"]:
+            return hybrid_result
+
+        fallback_movies = (
+            get_personalized_recommendations(
+                user_id=current_user.id,
+                db=db,
+                limit=limit,
+            )
+        )
+
+        return {
+            "strategy": "personalized_fallback",
+            "profile_interactions":
+                hybrid_result[
+                    "profile_interactions"
+                ],
+            "top_genres":
+                hybrid_result[
+                    "top_genres"
+                ],
+            "results": [
+                {
+                    "tmdb_id": movie["id"],
+                    "score": None,
+                    "neural_score": None,
+                    "content_score": None,
+                    "matched_genres": [],
+                }
+                for movie in fallback_movies
+            ],
+        }
+
     except FileNotFoundError as error:
         raise HTTPException(
             status_code=503,
             detail=str(error),
+        )
+
+    except httpx.HTTPStatusError:
+        raise HTTPException(
+            status_code=502,
+            detail="TMDB returned an error",
+        )
+
+    except httpx.RequestError:
+        raise HTTPException(
+            status_code=503,
+            detail="Could not connect to TMDB",
         )

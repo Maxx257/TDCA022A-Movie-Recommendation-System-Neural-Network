@@ -12,19 +12,22 @@ function NeuralRecommendations() {
   } = useAuth();
 
   const [movies, setMovies] = useState([]);
+  const [topGenres, setTopGenres] = useState([]);
   const [profileInteractions, setProfileInteractions] = useState(0);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
 
   useEffect(() => {
-    const loadNeuralRecommendations = async () => {
+    const loadRecommendations = async () => {
       if (authLoading) {
         return;
       }
 
       if (!user) {
         setMovies([]);
+        setTopGenres([]);
         setProfileInteractions(0);
         return;
       }
@@ -34,49 +37,63 @@ function NeuralRecommendations() {
 
       try {
         const response = await apiClient.get(
-          "/recommendations/neural",
+          "/recommendations/hybrid",
           {
             params: {
-              limit: 12,
+              limit: 20,
             },
           }
         );
 
-        const neuralResults = response.data.results || [];
+        const results =
+          response.data.results || [];
+
+        setTopGenres(
+          response.data.top_genres || []
+        );
 
         setProfileInteractions(
           response.data.profile_interactions || 0
         );
 
-        if (neuralResults.length === 0) {
+        if (results.length === 0) {
           setMovies([]);
           return;
         }
 
-        const movieRequests = neuralResults.map(
-          (item) =>
-            apiClient.get(
-              `/movies/${item.tmdb_id}`
-            )
+        const movieRequests = results.map(
+          async (recommendation) => {
+            const movieResponse =
+              await apiClient.get(
+                `/movies/${recommendation.tmdb_id}`
+              );
+
+            return {
+              movie: movieResponse.data,
+              recommendation,
+            };
+          }
         );
 
-        const movieResponses = await Promise.allSettled(
-          movieRequests
-        );
-
-        const loadedMovies = movieResponses
-          .filter(
-            (result) =>
-              result.status === "fulfilled"
-          )
-          .map(
-            (result) => result.value.data
+        const responses =
+          await Promise.allSettled(
+            movieRequests
           );
 
-        setMovies(loadedMovies);
+        const loadedMovies = responses
+            .filter(
+                (result) =>
+                result.status === "fulfilled"
+            )
+            .map(
+                (result) => result.value
+            )
+            .slice(0, 12);
+
+setMovies(loadedMovies);
       } catch (error) {
         console.error(
-          "Could not load neural recommendations:",
+          "Could not load hybrid recommendations:",
           error
         );
 
@@ -88,7 +105,7 @@ function NeuralRecommendations() {
       }
     };
 
-    loadNeuralRecommendations();
+    loadRecommendations();
   }, [user, authLoading]);
 
 
@@ -128,7 +145,7 @@ function NeuralRecommendations() {
     <section className="px-6 pb-16 md:px-16 lg:px-24">
       <div className="mb-6">
         <p className="text-sm font-semibold uppercase tracking-widest text-red-500">
-          Neural Recommendations
+          Hybrid AI Recommendations
         </p>
 
         <h2 className="mt-2 text-2xl font-bold sm:text-3xl">
@@ -136,21 +153,43 @@ function NeuralRecommendations() {
         </h2>
 
         <p className="mt-1 text-sm text-zinc-400">
-          Generated using your preferences and our trained neural recommendation model.
+          Personalized using neural learning and your movie preferences.
         </p>
 
-        <p className="mt-1 text-xs text-zinc-500">
+        {topGenres.length > 0 && (
+          <p className="mt-2 text-sm text-zinc-500">
+            Your current interests:{" "}
+            {topGenres.slice(0, 5).join(", ")}
+          </p>
+        )}
+
+        <p className="mt-1 text-xs text-zinc-600">
           Based on {profileInteractions} mapped interactions.
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {movies.map((movie) => (
-          <MovieCard
-            key={movie.id}
-            movie={movie}
-          />
-        ))}
+      <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+        {movies.map(
+          ({
+            movie,
+            recommendation,
+          }) => (
+            <div key={movie.id}>
+              <MovieCard
+                movie={movie}
+              />
+
+              {recommendation.matched_genres?.length > 0 && (
+                <p className="mt-2 text-xs leading-5 text-zinc-500">
+                  Because you like{" "}
+                  {recommendation.matched_genres.join(
+                    ", "
+                  )}
+                </p>
+              )}
+            </div>
+          )
+        )}
       </div>
     </section>
   );
