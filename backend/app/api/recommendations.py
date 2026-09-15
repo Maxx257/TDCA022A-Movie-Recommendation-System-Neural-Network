@@ -17,8 +17,14 @@ from app.services.recommendations import (
     get_because_you_liked,
     get_personalized_recommendations,
 )
+from app.services.neural_recommender import (
+    get_neural_recommendations,
+)
 from app.schemas.recommendation import (
     BecauseYouLikedResponse,
+)
+from app.schemas.neural_recommendation import (
+    NeuralRecommendationResponse,
 )
 
 router = APIRouter(
@@ -101,4 +107,36 @@ def because_you_liked(
         raise HTTPException(
             status_code=503,
             detail="Could not connect to TMDB",
+        )
+
+@router.get(
+    "/neural",
+    response_model=NeuralRecommendationResponse,
+)
+def neural_recommendations(
+    current_user: Annotated[
+        User,
+        Depends(get_current_user),
+    ],
+    db: Annotated[
+        Session,
+        Depends(get_db),
+    ],
+    limit: int = Query(
+        default=12,
+        ge=1,
+        le=20,
+    ),
+):
+    try:
+        return get_neural_recommendations(
+            user_id=current_user.id,
+            db=db,
+            limit=limit,
+        )
+
+    except FileNotFoundError as error:
+        raise HTTPException(
+            status_code=503,
+            detail=str(error),
         )

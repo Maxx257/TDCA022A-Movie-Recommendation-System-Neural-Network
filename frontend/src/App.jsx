@@ -7,6 +7,7 @@ import apiClient from "./api/client";
 import MovieCard from "./components/MovieCard";
 import TopPicks from "./components/TopPicks";
 import BecauseYouLiked from "./components/BecauseYouLiked";
+import NeuralRecommendations from "./components/NeuralRecommendations";
 
 function App() {
   const { user, logout } = useAuth();
@@ -129,6 +130,7 @@ useEffect(() => {
           </div>
         </section>
       </main>
+      <NeuralRecommendations />
       <TopPicks />
       <BecauseYouLiked />
       <RecentlyViewed />
