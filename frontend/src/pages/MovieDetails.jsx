@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import apiClient from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import SimilarMovies from "../components/SimilarMovies";
 
 
 function MovieDetails() {
@@ -465,6 +466,7 @@ const handleRemoveRating = async () => {
           </p>
         )}
       </section>
+      <SimilarMovies movieId={movie.id} />
     </div>
   );
 }
