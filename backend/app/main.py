@@ -11,6 +11,7 @@ from app.api.history import router as history_router
 from app.api.recommendations import (
     router as recommendations_router,
 )
+from app.api.watchlist import router as watchlist_router
 
 app = FastAPI(
     title="Movie Recommendation System API",
@@ -38,6 +39,7 @@ app.include_router(favorites_router)
 app.include_router(ratings_router)
 app.include_router(history_router)
 app.include_router(recommendations_router)
+app.include_router(watchlist_router)
 
 @app.get("/")
 def root():

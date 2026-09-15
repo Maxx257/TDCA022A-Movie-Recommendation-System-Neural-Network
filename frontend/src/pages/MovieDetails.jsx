@@ -14,7 +14,8 @@ function MovieDetails() {
   const [userRating, setUserRating] = useState(null);
   const [selectedRating, setSelectedRating] = useState(3);
   const [ratingLoading, setRatingLoading] = useState(false);
-
+  const [inWatchlist, setInWatchlist] = useState(false);
+  const [watchlistLoading, setWatchlistLoading] = useState(false);
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -162,6 +163,71 @@ const handleFavorite = async () => {
   }
 };
 
+useEffect(() => {
+  const loadWatchlistStatus = async () => {
+    if (!user || !movie) {
+      setInWatchlist(false);
+      return;
+    }
+
+    try {
+      const response = await apiClient.get(
+        `/watchlist/${movie.id}/status`
+      );
+
+      setInWatchlist(
+        response.data.in_watchlist
+      );
+    } catch (error) {
+      console.error(
+        "Could not load watchlist status:",
+        error
+      );
+    }
+  };
+
+  loadWatchlistStatus();
+}, [user, movie]);
+
+const handleWatchlist = async () => {
+  if (!user) {
+    navigate("/login");
+    return;
+  }
+
+  if (!movie || watchlistLoading) {
+    return;
+  }
+
+  setWatchlistLoading(true);
+
+  try {
+    if (inWatchlist) {
+      await apiClient.delete(
+        `/watchlist/${movie.id}`
+      );
+
+      setInWatchlist(false);
+    } else {
+      await apiClient.post(
+        "/watchlist",
+        {
+          movie_id: movie.id,
+        }
+      );
+
+      setInWatchlist(true);
+    }
+  } catch (error) {
+    console.error(
+      "Could not update watchlist:",
+      error
+    );
+  } finally {
+    setWatchlistLoading(false);
+  }
+};
+
 const handleSaveRating = async () => {
   if (!user) {
     navigate("/login");
@@ -272,8 +338,8 @@ const handleRemoveRating = async () => {
 
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-zinc-950/20" />
 
-        <div className="relative mx-auto flex max-w-7xl flex-col gap-8 px-6 py-10 md:flex-row md:items-end md:px-12 md:py-16">
-          <div className="w-48 shrink-0 sm:w-56 md:w-64">
+        <div className="relative mx-auto flex max-w-7xl flex-col gap-10 px-6 py-10 md:flex-row md:items-start md:px-12 md:py-16 lg:gap-12">
+          <div className="w-56 shrink-0 sm:w-64 md:w-72 lg:w-80">
             {movie.poster_url ? (
               <img
                 src={movie.poster_url}
@@ -287,7 +353,7 @@ const handleRemoveRating = async () => {
             )}
           </div>
 
-          <div className="max-w-3xl">
+          <div className="min-w-0 flex-1 max-w-3xl">
             <Link
               to="/"
               className="mb-5 inline-block text-sm text-zinc-300 hover:text-white"
@@ -322,23 +388,36 @@ const handleRemoveRating = async () => {
                 </span>
               ))}
             </div>
-            <div className="mt-6">
+            <div className="mt-6 flex flex-wrap gap-5">
   <button
-    type="button"
-    onClick={handleFavorite}
-    disabled={favoriteLoading}
-    className={
-      isFavorite
-        ? "rounded-md bg-red-600 px-6 py-3 font-semibold transition hover:bg-red-700 disabled:opacity-50"
-        : "rounded-md bg-zinc-800 px-6 py-3 font-semibold transition hover:bg-zinc-700 disabled:opacity-50"
-    }
-  >
-    {favoriteLoading
-      ? "Updating..."
-      : isFavorite
-        ? "♥ Favourited"
-        : "♡ Add to Favourites"}
-  </button>
+  type="button"
+  onClick={handleFavorite}
+  disabled={favoriteLoading}
+  className={
+    isFavorite
+      ? "min-w-[190px] rounded-lg bg-red-600 px-6 py-3 font-semibold transition hover:bg-red-700 disabled:opacity-50"
+      : "min-w-[190px] rounded-lg bg-zinc-800 px-6 py-3 font-semibold transition hover:bg-zinc-700 disabled:opacity-50"
+  }
+>
+  {favoriteLoading
+    ? "Updating..."
+    : isFavorite
+      ? "♥ Favourited"
+      : "♡ Add to Favourites"}
+</button>
+
+<button
+  type="button"
+  onClick={handleWatchlist}
+  disabled={watchlistLoading}
+  className="min-w-[190px] rounded-lg border border-zinc-500 px-6 py-3 font-semibold transition hover:border-zinc-300 hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50"
+>
+  {watchlistLoading
+    ? "Updating..."
+    : inWatchlist
+      ? "✓ In Watchlist"
+      : "+ Add to Watchlist"}
+</button>
 </div>
 <div className="mt-6 max-w-md rounded-lg border border-zinc-800 bg-zinc-900/80 p-5">
   <h3 className="font-semibold">
