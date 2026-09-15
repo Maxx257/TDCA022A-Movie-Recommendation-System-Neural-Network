@@ -20,11 +20,17 @@ from app.services.recommendations import (
 from app.services.neural_recommender import (
     get_neural_recommendations,
 )
+from app.services.hybrid_recommender import (
+    get_hybrid_recommendations,
+)
 from app.schemas.recommendation import (
     BecauseYouLikedResponse,
 )
 from app.schemas.neural_recommendation import (
     NeuralRecommendationResponse,
+)
+from app.schemas.hybrid_recommendation import (
+    HybridRecommendationResponse,
 )
 
 router = APIRouter(
@@ -177,4 +183,36 @@ def neural_recommendations(
         raise HTTPException(
             status_code=503,
             detail="Could not connect to TMDB",
+        )
+
+@router.get(
+    "/hybrid",
+    response_model=HybridRecommendationResponse,
+)
+def hybrid_recommendations(
+    current_user: Annotated[
+        User,
+        Depends(get_current_user),
+    ],
+    db: Annotated[
+        Session,
+        Depends(get_db),
+    ],
+    limit: int = Query(
+        default=12,
+        ge=1,
+        le=20,
+    ),
+):
+    try:
+        return get_hybrid_recommendations(
+            user_id=current_user.id,
+            db=db,
+            limit=limit,
+        )
+
+    except FileNotFoundError as error:
+        raise HTTPException(
+            status_code=503,
+            detail=str(error),
         )
