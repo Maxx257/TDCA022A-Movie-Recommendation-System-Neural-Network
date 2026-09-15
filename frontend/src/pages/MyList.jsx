@@ -84,7 +84,7 @@ function MyList() {
 
         <div className="mt-8">
           <h1 className="text-3xl font-bold sm:text-4xl">
-            My List
+            My Favourites
           </h1>
 
           <p className="mt-2 text-zinc-400">

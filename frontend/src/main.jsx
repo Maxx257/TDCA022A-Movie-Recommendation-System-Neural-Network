@@ -17,6 +17,7 @@ import Search from "./pages/Search.jsx";
 import Browse from "./pages/Browse.jsx";
 import MyList from "./pages/MyList.jsx";
 import Preferences from "./pages/Preferences.jsx";
+import Watchlist from "./pages/Watchlist";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -29,8 +30,7 @@ createRoot(document.getElementById("root")).render(
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
             <Route path="/my-list" element={<MyList />} />
-          <Route path="/search"element={<Search />}
-/>
+          <Route path="/search" element={<Search />} />
           <Route
   path="/movies/:movieId"
   element={<MovieDetails />}
@@ -38,6 +38,10 @@ createRoot(document.getElementById("root")).render(
 <Route
   path="/preferences"
   element={<Preferences />}
+/>
+<Route
+  path="/watchlist"
+  element={<Watchlist />}
 />
         </Routes>
       </AuthProvider>

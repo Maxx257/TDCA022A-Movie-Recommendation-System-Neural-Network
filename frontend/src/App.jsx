@@ -67,7 +67,14 @@ useEffect(() => {
   to="/my-list"
   className="hidden text-sm text-zinc-300 transition hover:text-white md:block"
 >
-  My List
+  Favourites
+</Link>
+
+<Link
+  to="/watchlist"
+  className="hidden text-sm text-zinc-300 transition hover:text-white md:block"
+>
+  Watchlist
 </Link>
 
       <span className="text-sm text-zinc-300">
