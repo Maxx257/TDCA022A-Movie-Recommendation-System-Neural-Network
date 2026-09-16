@@ -69,29 +69,41 @@ function Search() {
 
 
   return (
-    <div className="min-h-screen bg-zinc-950 px-6 py-8 text-white md:px-12 lg:px-24">
-      <div className="mx-auto max-w-7xl">
+    <div className="min-h-screen bg-zinc-950 text-white">
+      <div className="mx-auto max-w-7xl px-6 py-10 md:px-12 lg:px-16">
+
         <Link
           to="/"
-          className="text-sm text-zinc-400 transition hover:text-white"
+          className="inline-flex items-center text-sm text-zinc-500 transition hover:text-white"
         >
           ← Back to Home
         </Link>
 
-        <div className="mt-8">
-          <h1 className="text-3xl font-bold sm:text-4xl">
+
+        {/* Page heading */}
+        <div className="mt-10 max-w-3xl">
+
+          <p className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
+            Find Something
+          </p>
+
+          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">
             Search Movies
           </h1>
 
-          <p className="mt-2 text-zinc-400">
+          <p className="mt-3 text-sm leading-6 text-zinc-400 sm:text-base">
             Search for movies by title.
           </p>
+
         </div>
 
+
+        {/* Search bar */}
         <form
           onSubmit={handleSubmit}
-          className="mt-8 flex max-w-2xl gap-3"
+          className="mt-10 flex max-w-3xl flex-col gap-3 sm:flex-row"
         >
+
           <input
             type="text"
             value={searchText}
@@ -99,56 +111,84 @@ function Search() {
               setSearchText(event.target.value)
             }
             placeholder="Search movies..."
-            className="min-w-0 flex-1 rounded-md border border-zinc-700 bg-zinc-900 px-4 py-3 outline-none transition focus:border-red-500"
+            className="min-w-0 flex-1 rounded-lg border border-white/10 bg-zinc-900/70 px-5 py-3.5 text-sm text-white outline-none transition placeholder:text-zinc-600 hover:border-white/20 focus:border-white/30 focus:ring-2 focus:ring-white/5"
           />
+
 
           <button
             type="submit"
-            className="rounded-md bg-red-600 px-6 py-3 font-semibold transition hover:bg-red-700"
+            className="rounded-lg bg-white px-7 py-3.5 text-sm font-semibold text-black transition hover:bg-zinc-200"
           >
             Search
           </button>
+
         </form>
 
+
+        {/* Results heading */}
         {queryFromUrl && (
-          <h2 className="mt-10 text-xl font-semibold">
-            Results for "{queryFromUrl}"
-          </h2>
+          <div className="mt-12">
+            <p className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
+              Search Results
+            </p>
+
+            <h2 className="mt-2 text-2xl font-semibold tracking-[-0.025em] text-white">
+              Results for{" "}
+              <span className="text-zinc-300">
+                "{queryFromUrl}"
+              </span>
+            </h2>
+          </div>
         )}
 
+
+        {/* Loading */}
         {loading && (
-          <p className="mt-8 text-zinc-400">
+          <p className="mt-8 text-sm text-zinc-500">
             Searching...
           </p>
         )}
 
+
+        {/* Error */}
         {error && (
-          <p className="mt-8 rounded-md bg-red-950 p-4 text-red-300">
-            {error}
-          </p>
+          <div className="mt-8 rounded-lg border border-red-900/50 bg-red-950/30 px-4 py-3">
+            <p className="text-sm text-red-300">
+              {error}
+            </p>
+          </div>
         )}
 
+
+        {/* No results */}
         {!loading &&
           !error &&
           queryFromUrl &&
           movies.length === 0 && (
-            <p className="mt-8 text-zinc-400">
-              No movies found.
-            </p>
+            <div className="mt-8 rounded-xl border border-white/10 bg-white/[0.02] px-6 py-12 text-center">
+              <p className="text-sm text-zinc-400">
+                No movies found.
+              </p>
+            </div>
           )}
 
+
+        {/* Movie grid */}
         {!loading &&
           !error &&
           movies.length > 0 && (
-            <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+            <div className="mt-8 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+
               {movies.map((movie) => (
                 <MovieCard
                   key={movie.id}
                   movie={movie}
                 />
               ))}
+
             </div>
           )}
+
       </div>
     </div>
   );

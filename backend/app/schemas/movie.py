@@ -21,11 +21,20 @@ class MovieListResponse(BaseModel):
     total_results: int
     results: list[MovieSummary]
 
+
 class CastMember(BaseModel):
     id: int
     name: str
     character: str
     profile_url: str | None
+
+
+class TrailerInfo(BaseModel):
+    key: str
+    name: str
+    site: str
+    type: str
+    official: bool
 
 
 class MovieDetails(BaseModel):
@@ -41,6 +50,8 @@ class MovieDetails(BaseModel):
     original_language: str
     genres: list[str]
     cast: list[CastMember]
+    trailer: TrailerInfo | None = None
+
 
 class Genre(BaseModel):
     id: int

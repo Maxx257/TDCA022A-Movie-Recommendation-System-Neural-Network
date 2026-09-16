@@ -4,15 +4,16 @@ import apiClient from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import MovieCard from "./MovieCard";
 
+
 function RecentlyViewed() {
   const {
     user,
     loading: authLoading,
   } = useAuth();
 
-    console.log("RecentlyViewed rendered");
-    console.log("user =", user);
-    console.log("authLoading =", authLoading);
+  console.log("RecentlyViewed rendered");
+  console.log("user =", user);
+  console.log("authLoading =", authLoading);
 
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -40,7 +41,10 @@ function RecentlyViewed() {
           "/history"
         );
 
-        console.log("History data:", historyResponse.data);
+        console.log(
+          "History data:",
+          historyResponse.data
+        );
 
         const recentHistory =
           historyResponse.data.slice(0, 6);
@@ -58,7 +62,9 @@ function RecentlyViewed() {
         );
 
         const movieResponses =
-          await Promise.allSettled(movieRequests);
+          await Promise.allSettled(
+            movieRequests
+          );
 
         const loadedMovies = movieResponses
           .filter(
@@ -95,8 +101,8 @@ function RecentlyViewed() {
 
   if (loading) {
     return (
-      <section className="px-6 pb-12 md:px-16 lg:px-24">
-        <p className="text-zinc-400">
+      <section className="px-6 py-14 md:px-16 lg:px-24">
+        <p className="text-sm text-zinc-500">
           Loading recently viewed...
         </p>
       </section>
@@ -106,8 +112,8 @@ function RecentlyViewed() {
 
   if (error) {
     return (
-      <section className="px-6 pb-12 md:px-16 lg:px-24">
-        <p className="text-red-400">
+      <section className="px-6 py-14 md:px-16 lg:px-24">
+        <p className="text-sm text-red-400">
           {error}
         </p>
       </section>
@@ -121,25 +127,36 @@ function RecentlyViewed() {
 
 
   return (
-    <section className="px-6 pb-16 md:px-16 lg:px-24">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold sm:text-3xl">
+    <section className="border-t border-white/5 px-6 py-16 md:px-16 lg:px-24">
+
+      <div className="mb-8 max-w-3xl">
+
+        <p className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
+          Your History
+        </p>
+
+        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em] text-white sm:text-3xl">
           Recently Viewed
         </h2>
 
-        <p className="mt-1 text-sm text-zinc-400">
+        <p className="mt-2 text-sm leading-6 text-zinc-400">
           Continue exploring movies you recently viewed.
         </p>
+
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+
+      <div className="grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+
         {movies.map((movie) => (
           <MovieCard
             key={movie.id}
             movie={movie}
           />
         ))}
+
       </div>
+
     </section>
   );
 }

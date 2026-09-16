@@ -120,7 +120,6 @@ def format_cast_member(cast_member: dict) -> dict:
         ),
     }
 
-
 def get_movie_details(movie_id: int) -> dict:
     url = f"{settings.tmdb_base_url}/movie/{movie_id}"
 
@@ -129,7 +128,7 @@ def get_movie_details(movie_id: int) -> dict:
         headers=get_tmdb_headers(),
         params={
             "language": "en-US",
-            "append_to_response": "credits",
+            "append_to_response": "credits,videos",
         },
         timeout=10.0,
     )
@@ -140,34 +139,130 @@ def get_movie_details(movie_id: int) -> dict:
 
     cast = movie.get("credits", {}).get("cast", [])
 
+    videos = movie.get("videos", {}).get("results", [])
+
+
+    # Only use YouTube videos
+    youtube_videos = [
+        video
+        for video in videos
+        if video.get("site") == "YouTube"
+    ]
+
+
+    # Prefer an official trailer
+    trailer = next(
+        (
+            video
+            for video in youtube_videos
+            if video.get("type") == "Trailer"
+            and video.get("official") is True
+        ),
+        None,
+    )
+
+
+    # Fall back to any trailer
+    if trailer is None:
+        trailer = next(
+            (
+                video
+                for video in youtube_videos
+                if video.get("type") == "Trailer"
+            ),
+            None,
+        )
+
+
+    # Fall back to an official teaser
+    if trailer is None:
+        trailer = next(
+            (
+                video
+                for video in youtube_videos
+                if video.get("type") == "Teaser"
+                and video.get("official") is True
+            ),
+            None,
+        )
+
+
+    # Last fallback: any teaser
+    if trailer is None:
+        trailer = next(
+            (
+                video
+                for video in youtube_videos
+                if video.get("type") == "Teaser"
+            ),
+            None,
+        )
+
+
     return {
         "id": movie["id"],
         "title": movie.get("title", ""),
         "overview": movie.get("overview", ""),
+
         "poster_url": build_image_url(
             movie.get("poster_path"),
             POSTER_BASE_URL,
         ),
+
         "backdrop_url": build_image_url(
             movie.get("backdrop_path"),
             BACKDROP_BASE_URL,
         ),
+
         "release_date": movie.get("release_date") or None,
-        "vote_average": movie.get("vote_average", 0.0),
-        "vote_count": movie.get("vote_count", 0),
+
+        "vote_average": movie.get(
+            "vote_average",
+            0.0,
+        ),
+
+        "vote_count": movie.get(
+            "vote_count",
+            0,
+        ),
+
         "runtime": movie.get("runtime"),
+
         "original_language": movie.get(
             "original_language",
             "",
         ),
+
         "genres": [
             genre["name"]
-            for genre in movie.get("genres", [])
+            for genre in movie.get(
+                "genres",
+                [],
+            )
         ],
+
         "cast": [
             format_cast_member(member)
             for member in cast[:10]
         ],
+
+        "trailer": (
+            {
+                "key": trailer.get("key"),
+                "name": trailer.get(
+                    "name",
+                    "Trailer",
+                ),
+                "site": trailer.get("site"),
+                "type": trailer.get("type"),
+                "official": trailer.get(
+                    "official",
+                    False,
+                ),
+            }
+            if trailer
+            else None
+        ),
     }
 
 def get_movie_genres() -> dict:

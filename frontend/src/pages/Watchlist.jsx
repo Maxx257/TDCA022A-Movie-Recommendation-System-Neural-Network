@@ -86,7 +86,7 @@ function Watchlist() {
 
   if (authLoading || loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-950 text-zinc-400">
+      <div className="flex min-h-screen items-center justify-center bg-zinc-950 text-sm text-zinc-500">
         Loading watchlist...
       </div>
     );
@@ -95,21 +95,35 @@ function Watchlist() {
 
   if (!user) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-950 px-6 text-center text-white">
-        <h1 className="text-3xl font-bold">
-          Your Watchlist
-        </h1>
+      <div className="flex min-h-screen items-center justify-center bg-zinc-950 px-6 text-center text-white">
 
-        <p className="mt-3 text-zinc-400">
-          Log in to view movies you saved for later.
-        </p>
+        <div className="max-w-md">
 
-        <Link
-          to="/login"
-          className="mt-6 rounded-lg bg-red-600 px-6 py-3 font-semibold transition hover:bg-red-700"
-        >
-          Login
-        </Link>
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/5 text-xl text-zinc-300">
+            +
+          </div>
+
+          <p className="mt-5 text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
+            Watchlist
+          </p>
+
+          <h1 className="mt-3 text-3xl font-semibold tracking-[-0.035em] text-white sm:text-4xl">
+            Your Watchlist
+          </h1>
+
+          <p className="mt-3 text-sm leading-6 text-zinc-400">
+            Log in to view movies you saved for later.
+          </p>
+
+          <Link
+            to="/login"
+            className="mt-7 inline-flex rounded-lg bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-zinc-200"
+          >
+            Login
+          </Link>
+
+        </div>
+
       </div>
     );
   }
@@ -117,58 +131,110 @@ function Watchlist() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      <div className="mx-auto max-w-7xl px-6 py-10 md:px-12">
-        <div className="mb-10">
-          <Link
-            to="/"
-            className="text-sm text-zinc-400 transition hover:text-white"
-          >
-            ← Back to Home
-          </Link>
 
-          <h1 className="mt-5 text-3xl font-bold sm:text-4xl">
+      <div className="mx-auto max-w-7xl px-6 py-10 md:px-12 lg:px-16">
+
+        <Link
+          to="/"
+          className="inline-flex items-center text-sm text-zinc-500 transition hover:text-white"
+        >
+          ← Back to Home
+        </Link>
+
+
+        {/* Page heading */}
+        <div className="mt-10 max-w-3xl">
+
+          <p className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
+            Saved for Later
+          </p>
+
+          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">
             My Watchlist
           </h1>
 
-          <p className="mt-2 text-zinc-400">
+          <p className="mt-3 text-sm leading-6 text-zinc-400 sm:text-base">
             Movies you saved to watch later.
           </p>
+
         </div>
 
+
+        {/* Error */}
         {error && (
-          <p className="mb-6 text-red-400">
-            {error}
-          </p>
+          <div className="mt-12 rounded-lg border border-red-900/50 bg-red-950/30 px-4 py-3">
+            <p className="text-sm text-red-300">
+              {error}
+            </p>
+          </div>
         )}
 
+
+        {/* Empty watchlist */}
         {!error && movies.length === 0 ? (
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-10 text-center">
-            <h2 className="text-xl font-semibold">
-              Your watchlist is empty
-            </h2>
+          <div className="mt-12 flex min-h-[320px] items-center justify-center rounded-2xl border border-white/10 bg-white/[0.02] px-6 text-center">
 
-            <p className="mt-2 text-zinc-400">
-              Browse movies and add the ones you want to watch later.
-            </p>
+            <div className="max-w-md">
 
-            <Link
-              to="/browse"
-              className="mt-6 inline-block rounded-lg bg-red-600 px-6 py-3 font-semibold transition hover:bg-red-700"
-            >
-              Browse Movies
-            </Link>
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/5 text-xl text-zinc-300">
+                +
+              </div>
+
+              <h2 className="mt-5 text-xl font-semibold tracking-tight text-white">
+                Your watchlist is empty
+              </h2>
+
+              <p className="mt-2 text-sm leading-6 text-zinc-400">
+                Browse movies and save the ones you want to watch later.
+              </p>
+
+              <Link
+                to="/browse"
+                className="mt-7 inline-flex rounded-lg bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-zinc-200"
+              >
+                Browse Movies
+              </Link>
+
+            </div>
+
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-            {movies.map((movie) => (
-              <MovieCard
-                key={movie.id}
-                movie={movie}
-              />
-            ))}
-          </div>
+          !error && (
+            <section className="mt-12">
+
+              <div className="mb-7">
+
+                <p className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
+                  Saved Movies
+                </p>
+
+                <h2 className="mt-2 text-2xl font-semibold tracking-[-0.025em] text-white">
+                  {movies.length}{" "}
+                  {movies.length === 1
+                    ? "Movie"
+                    : "Movies"}
+                </h2>
+
+              </div>
+
+
+              <div className="grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+
+                {movies.map((movie) => (
+                  <MovieCard
+                    key={movie.id}
+                    movie={movie}
+                  />
+                ))}
+
+              </div>
+
+            </section>
+          )
         )}
+
       </div>
+
     </div>
   );
 }

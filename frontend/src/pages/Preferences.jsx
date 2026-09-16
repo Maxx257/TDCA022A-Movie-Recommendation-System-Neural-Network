@@ -98,7 +98,7 @@ function Preferences() {
 
   if (authLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-950 text-zinc-400">
+      <div className="flex min-h-screen items-center justify-center bg-zinc-950 text-sm text-zinc-500">
         Loading...
       </div>
     );
@@ -116,41 +116,55 @@ function Preferences() {
 
 
   return (
-    <div className="min-h-screen bg-zinc-950 px-6 py-10 text-white md:px-12 lg:px-24">
-      <div className="mx-auto max-w-7xl">
-        <div className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-widest text-red-500">
-            Personalize your experience
+    <div className="min-h-screen bg-zinc-950 text-white">
+
+      <div className="mx-auto max-w-7xl px-6 py-10 md:px-12 lg:px-16">
+
+        {/* Heading */}
+        <div className="max-w-3xl">
+
+          <p className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
+            Personalize Your Experience
           </p>
 
-          <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
+          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">
             Choose movies you like
           </h1>
 
-          <p className="mt-3 text-zinc-400">
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-400 sm:text-base">
             Select at least 3 movies so we can understand your preferences.
           </p>
 
-          <p className="mt-2 text-sm text-zinc-500">
+          <div className="mt-5 inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-300">
             Selected: {selectedMovies.length}
-          </p>
+          </div>
+
         </div>
 
+
+        {/* Error */}
         {error && (
-          <p className="mt-6 rounded-md bg-red-950 p-4 text-red-300">
-            {error}
-          </p>
+          <div className="mt-8 rounded-lg border border-red-900/50 bg-red-950/30 px-4 py-3">
+            <p className="text-sm text-red-300">
+              {error}
+            </p>
+          </div>
         )}
 
+
+        {/* Loading */}
         {loading ? (
-          <p className="mt-10 text-zinc-400">
+          <p className="mt-12 text-sm text-zinc-500">
             Loading movies...
           </p>
         ) : (
-          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+          <div className="mt-10 grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+
             {movies.map((movie) => {
               const selected =
-                selectedMovies.includes(movie.id);
+                selectedMovies.includes(
+                  movie.id
+                );
 
               return (
                 <button
@@ -159,18 +173,26 @@ function Preferences() {
                   onClick={() =>
                     toggleMovie(movie.id)
                   }
-                  className={
-                    selected
-                      ? "group overflow-hidden rounded-lg border-2 border-red-500 bg-zinc-900 text-left"
-                      : "group overflow-hidden rounded-lg border-2 border-transparent bg-zinc-900 text-left transition hover:border-zinc-700"
-                  }
+                  className="group text-left"
                 >
-                  <div className="relative aspect-[2/3] overflow-hidden bg-zinc-800">
+
+                  <div
+                    className={
+                      selected
+                        ? "relative aspect-[2/3] overflow-hidden rounded-lg border-2 border-white bg-zinc-900 shadow-xl shadow-black/30 transition duration-300"
+                        : "relative aspect-[2/3] overflow-hidden rounded-lg border-2 border-transparent bg-zinc-900 shadow-lg shadow-black/20 transition duration-300 group-hover:-translate-y-1 group-hover:border-white/15 group-hover:shadow-2xl group-hover:shadow-black/40"
+                    }
+                  >
+
                     {movie.poster_url ? (
                       <img
                         src={movie.poster_url}
                         alt={`${movie.title} poster`}
-                        className="h-full w-full object-cover"
+                        className={
+                          selected
+                            ? "h-full w-full object-cover brightness-75 transition duration-500"
+                            : "h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+                        }
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center px-3 text-center text-sm text-zinc-500">
@@ -178,30 +200,72 @@ function Preferences() {
                       </div>
                     )}
 
+
+                    {/* Selected overlay */}
                     {selected && (
-                      <div className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-600 font-bold">
-                        ✓
-                      </div>
+                      <>
+                        <div className="absolute inset-0 bg-black/15" />
+
+                        <div className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold text-black shadow-lg">
+                          ✓
+                        </div>
+                      </>
                     )}
+
                   </div>
 
-                  <div className="p-3">
-                    <p className="truncate font-semibold">
+
+                  <div className="pt-3">
+
+                    <p
+                      className={
+                        selected
+                          ? "truncate text-sm font-medium text-white"
+                          : "truncate text-sm font-medium text-zinc-200 transition group-hover:text-white"
+                      }
+                    >
                       {movie.title}
                     </p>
+
                   </div>
+
                 </button>
               );
             })}
+
           </div>
         )}
 
+
+        {/* Sticky continue bar */}
         {!loading && (
-          <div className="sticky bottom-0 mt-10 border-t border-zinc-800 bg-zinc-950/95 py-5 backdrop-blur">
-            <div className="flex items-center justify-between gap-4">
-              <p className="text-sm text-zinc-400">
-                Choose at least 3 movies.
-              </p>
+          <div className="sticky bottom-0 z-20 mt-12 border-t border-white/10 bg-zinc-950/90 py-5 backdrop-blur-xl">
+
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+              <div>
+
+                <p className="text-sm text-zinc-300">
+                  {selectedMovies.length < 3
+                    ? `Choose ${
+                        3 -
+                        selectedMovies.length
+                      } more ${
+                        3 -
+                          selectedMovies.length ===
+                        1
+                          ? "movie"
+                          : "movies"
+                      }.`
+                    : "You're ready to continue."}
+                </p>
+
+                <p className="mt-1 text-xs text-zinc-600">
+                  These choices help personalize your recommendations.
+                </p>
+
+              </div>
+
 
               <button
                 type="button"
@@ -210,16 +274,20 @@ function Preferences() {
                   saving ||
                   selectedMovies.length < 3
                 }
-                className="rounded-md bg-red-600 px-6 py-3 font-semibold transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-lg bg-white px-7 py-3 text-sm font-semibold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-30"
               >
                 {saving
                   ? "Saving..."
                   : "Continue"}
               </button>
+
             </div>
+
           </div>
         )}
+
       </div>
+
     </div>
   );
 }

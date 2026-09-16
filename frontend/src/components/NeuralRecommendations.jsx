@@ -81,16 +81,16 @@ function NeuralRecommendations() {
           );
 
         const loadedMovies = responses
-            .filter(
-                (result) =>
-                result.status === "fulfilled"
-            )
-            .map(
-                (result) => result.value
-            )
-            .slice(0, 12);
+          .filter(
+            (result) =>
+              result.status === "fulfilled"
+          )
+          .map(
+            (result) => result.value
+          )
+          .slice(0, 12);
 
-setMovies(loadedMovies);
+        setMovies(loadedMovies);
       } catch (error) {
         console.error(
           "Could not load hybrid recommendations:",
@@ -116,8 +116,8 @@ setMovies(loadedMovies);
 
   if (loading) {
     return (
-      <section className="px-6 pb-12 md:px-16 lg:px-24">
-        <p className="text-zinc-400">
+      <section className="px-6 py-14 md:px-16 lg:px-24">
+        <p className="text-sm text-zinc-500">
           Generating AI recommendations...
         </p>
       </section>
@@ -127,8 +127,8 @@ setMovies(loadedMovies);
 
   if (error) {
     return (
-      <section className="px-6 pb-12 md:px-16 lg:px-24">
-        <p className="text-red-400">
+      <section className="px-6 py-14 md:px-16 lg:px-24">
+        <p className="text-sm text-red-400">
           {error}
         </p>
       </section>
@@ -142,55 +142,76 @@ setMovies(loadedMovies);
 
 
   return (
-    <section className="px-6 pb-16 md:px-16 lg:px-24">
-      <div className="mb-6">
-        <p className="text-sm font-semibold uppercase tracking-widest text-red-500">
+    <section className="border-t border-white/5 px-6 py-16 md:px-16 lg:px-24">
+
+      <div className="mb-8 max-w-3xl">
+
+        <p className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
           Hybrid AI Recommendations
         </p>
 
-        <h2 className="mt-2 text-2xl font-bold sm:text-3xl">
+        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em] text-white sm:text-3xl">
           AI Picks for You
         </h2>
 
-        <p className="mt-1 text-sm text-zinc-400">
+        <p className="mt-2 text-sm leading-6 text-zinc-400">
           Personalized using neural learning and your movie preferences.
         </p>
 
+
         {topGenres.length > 0 && (
-          <p className="mt-2 text-sm text-zinc-500">
-            Your current interests:{" "}
-            {topGenres.slice(0, 5).join(", ")}
-          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {topGenres
+              .slice(0, 5)
+              .map((genre) => (
+                <span
+                  key={genre}
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-300"
+                >
+                  {genre}
+                </span>
+              ))}
+          </div>
         )}
 
-        <p className="mt-1 text-xs text-zinc-600">
+
+        <p className="mt-4 text-xs text-zinc-600">
           Based on {profileInteractions} mapped interactions.
         </p>
+
       </div>
 
-      <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+
+      <div className="grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+
         {movies.map(
           ({
             movie,
             recommendation,
           }) => (
             <div key={movie.id}>
+
               <MovieCard
                 movie={movie}
               />
 
               {recommendation.matched_genres?.length > 0 && (
-                <p className="mt-2 text-xs leading-5 text-zinc-500">
+                <p className="mt-2.5 line-clamp-2 text-xs leading-5 text-zinc-500">
                   Because you like{" "}
-                  {recommendation.matched_genres.join(
-                    ", "
-                  )}
+                  <span className="text-zinc-400">
+                    {recommendation.matched_genres.join(
+                      ", "
+                    )}
+                  </span>
                 </p>
               )}
+
             </div>
           )
         )}
+
       </div>
+
     </section>
   );
 }

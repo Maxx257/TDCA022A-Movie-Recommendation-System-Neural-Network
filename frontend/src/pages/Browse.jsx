@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import apiClient from "../api/client";
 import MovieCard from "../components/MovieCard";
+import FilterDropdown from "../components/FilterDropdown";
 
 
 function Browse() {
@@ -18,12 +19,14 @@ function Browse() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+
   const currentYear = new Date().getFullYear();
 
   const years = Array.from(
     { length: 50 },
     (_, index) => currentYear - index
   );
+
 
   const languages = [
     { code: "en", name: "English" },
@@ -41,6 +44,7 @@ function Browse() {
     { code: "de", name: "German" },
   ];
 
+
   const countries = [
     { code: "IN", name: "India" },
     { code: "US", name: "United States" },
@@ -55,14 +59,63 @@ function Browse() {
   ];
 
 
+  /*
+    Convert all filter data into the format
+    expected by FilterDropdown:
+    { value, label }
+  */
+
+  const genreOptions = genres.map((genre) => ({
+    value: genre.id,
+    label: genre.name,
+  }));
+
+
+  const yearOptions = years.map((year) => ({
+    value: year,
+    label: year.toString(),
+  }));
+
+
+  const ratingOptions = [
+    { value: "5", label: "5+ ★" },
+    { value: "6", label: "6+ ★" },
+    { value: "7", label: "7+ ★" },
+    { value: "8", label: "8+ ★" },
+    { value: "9", label: "9+ ★" },
+  ];
+
+
+  const languageOptions = languages.map(
+    (language) => ({
+      value: language.code,
+      label: language.name,
+    })
+  );
+
+
+  const countryOptions = countries.map(
+    (country) => ({
+      value: country.code,
+      label: country.name,
+    })
+  );
+
+
   useEffect(() => {
     const loadGenres = async () => {
       try {
-        const response = await apiClient.get("/movies/genres");
+        const response = await apiClient.get(
+          "/movies/genres"
+        );
+
         setGenres(response.data.genres);
       } catch (error) {
         console.error(error);
-        setError("Could not load movie genres.");
+
+        setError(
+          "Could not load movie genres."
+        );
       }
     };
 
@@ -80,41 +133,61 @@ function Browse() {
           page: 1,
         };
 
+
         if (selectedGenre) {
           params.genre_id = selectedGenre;
         }
+
 
         if (selectedYear) {
           params.year = selectedYear;
         }
 
+
         if (selectedRating) {
           params.min_rating = selectedRating;
         }
 
+
         if (selectedLanguage) {
-          params.language_code = selectedLanguage;
+          params.language_code =
+            selectedLanguage;
         }
 
+
         if (selectedCountry) {
-          params.country_code = selectedCountry;
+          params.country_code =
+            selectedCountry;
         }
+
 
         const response = await apiClient.get(
           "/movies/discover",
-          { params }
+          {
+            params,
+          }
         );
 
-        setMovies(response.data.results);
+
+        setMovies(
+          response.data.results
+        );
+
       } catch (error) {
         console.error(error);
-        setError("Could not load movies.");
+
+        setError(
+          "Could not load movies."
+        );
+
       } finally {
         setLoading(false);
       }
     };
 
+
     loadMovies();
+
   }, [
     selectedGenre,
     selectedYear,
@@ -134,211 +207,263 @@ function Browse() {
 
 
   return (
-    <div className="min-h-screen bg-zinc-950 px-6 py-8 text-white md:px-12 lg:px-24">
-      <div className="mx-auto max-w-7xl">
+    <div className="min-h-screen bg-zinc-950 text-white">
+
+      <div className="mx-auto max-w-7xl px-6 py-10 md:px-12 lg:px-16">
+
         <Link
           to="/"
-          className="text-sm text-zinc-400 transition hover:text-white"
+          className="inline-flex items-center text-sm text-zinc-500 transition hover:text-white"
         >
           ← Back to Home
         </Link>
 
-        <div className="mt-8">
-          <h1 className="text-3xl font-bold sm:text-4xl">
+
+        {/* Page heading */}
+        <div className="mt-10 max-w-3xl">
+
+          <p className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
+            Explore
+          </p>
+
+          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.035em] text-white sm:text-5xl">
             Browse Movies
           </h1>
 
-          <p className="mt-2 text-zinc-400">
-            Explore movies using genre, year, rating, language and country.
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-400 sm:text-base">
+            Explore movies using genre, year, rating,
+            language and country.
           </p>
+
         </div>
 
-        <div className="mt-8 grid gap-4 rounded-xl border border-zinc-800 bg-zinc-900 p-5 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <label
-              htmlFor="genre"
-              className="mb-2 block text-sm font-medium text-zinc-300"
-            >
-              Genre
-            </label>
 
-            <select
-              id="genre"
-              value={selectedGenre}
-              onChange={(event) =>
-                setSelectedGenre(event.target.value)
-              }
-              className="w-full rounded-md border border-zinc-700 bg-zinc-950 px-4 py-3 outline-none focus:border-red-500"
-            >
-              <option value="">All Genres</option>
+        {/* Filters */}
+        <section className="relative z-40 mt-10">
 
-              {genres.map((genre) => (
-                <option
-                  key={genre.id}
-                  value={genre.id}
+          <div className="overflow-visible rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-sm sm:p-6">
+
+            <div className="mb-5">
+
+              <h2 className="text-sm font-medium text-white">
+                Filter movies
+              </h2>
+
+              <p className="mt-1 text-xs text-zinc-500">
+                Refine the collection to find what you want.
+              </p>
+
+            </div>
+
+
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+
+
+              {/* Genre */}
+              <div>
+
+                <label
+                  htmlFor="genre"
+                  className="mb-2 block text-xs font-medium uppercase tracking-wider text-zinc-500"
                 >
-                  {genre.name}
-                </option>
-              ))}
-            </select>
-          </div>
+                  Genre
+                </label>
 
-          <div>
-            <label
-              htmlFor="year"
-              className="mb-2 block text-sm font-medium text-zinc-300"
-            >
-              Release Year
-            </label>
+                <FilterDropdown
+                  id="genre"
+                  value={selectedGenre}
+                  onChange={setSelectedGenre}
+                  options={genreOptions}
+                  placeholder="All Genres"
+                />
 
-            <select
-              id="year"
-              value={selectedYear}
-              onChange={(event) =>
-                setSelectedYear(event.target.value)
-              }
-              className="w-full rounded-md border border-zinc-700 bg-zinc-950 px-4 py-3 outline-none focus:border-red-500"
-            >
-              <option value="">All Years</option>
+              </div>
 
-              {years.map((year) => (
-                <option
-                  key={year}
-                  value={year}
+
+              {/* Year */}
+              <div>
+
+                <label
+                  htmlFor="year"
+                  className="mb-2 block text-xs font-medium uppercase tracking-wider text-zinc-500"
                 >
-                  {year}
-                </option>
-              ))}
-            </select>
-          </div>
+                  Release Year
+                </label>
 
-          <div>
-            <label
-              htmlFor="rating"
-              className="mb-2 block text-sm font-medium text-zinc-300"
-            >
-              Minimum Rating
-            </label>
+                <FilterDropdown
+                  id="year"
+                  value={selectedYear}
+                  onChange={setSelectedYear}
+                  options={yearOptions}
+                  placeholder="All Years"
+                />
 
-            <select
-              id="rating"
-              value={selectedRating}
-              onChange={(event) =>
-                setSelectedRating(event.target.value)
-              }
-              className="w-full rounded-md border border-zinc-700 bg-zinc-950 px-4 py-3 outline-none focus:border-red-500"
-            >
-              <option value="">Any Rating</option>
-              <option value="5">5+ ★</option>
-              <option value="6">6+ ★</option>
-              <option value="7">7+ ★</option>
-              <option value="8">8+ ★</option>
-              <option value="9">9+ ★</option>
-            </select>
-          </div>
+              </div>
 
-          <div>
-            <label
-              htmlFor="language"
-              className="mb-2 block text-sm font-medium text-zinc-300"
-            >
-              Language
-            </label>
 
-            <select
-              id="language"
-              value={selectedLanguage}
-              onChange={(event) =>
-                setSelectedLanguage(event.target.value)
-              }
-              className="w-full rounded-md border border-zinc-700 bg-zinc-950 px-4 py-3 outline-none focus:border-red-500"
-            >
-              <option value="">All Languages</option>
+              {/* Rating */}
+              <div>
 
-              {languages.map((language) => (
-                <option
-                  key={language.code}
-                  value={language.code}
+                <label
+                  htmlFor="rating"
+                  className="mb-2 block text-xs font-medium uppercase tracking-wider text-zinc-500"
                 >
-                  {language.name}
-                </option>
-              ))}
-            </select>
-          </div>
+                  Minimum Rating
+                </label>
 
-          <div>
-            <label
-              htmlFor="country"
-              className="mb-2 block text-sm font-medium text-zinc-300"
-            >
-              Country
-            </label>
+                <FilterDropdown
+                  id="rating"
+                  value={selectedRating}
+                  onChange={setSelectedRating}
+                  options={ratingOptions}
+                  placeholder="Any Rating"
+                />
 
-            <select
-              id="country"
-              value={selectedCountry}
-              onChange={(event) =>
-                setSelectedCountry(event.target.value)
-              }
-              className="w-full rounded-md border border-zinc-700 bg-zinc-950 px-4 py-3 outline-none focus:border-red-500"
-            >
-              <option value="">All Countries</option>
+              </div>
 
-              {countries.map((country) => (
-                <option
-                  key={country.code}
-                  value={country.code}
+
+              {/* Language */}
+              <div>
+
+                <label
+                  htmlFor="language"
+                  className="mb-2 block text-xs font-medium uppercase tracking-wider text-zinc-500"
                 >
-                  {country.name}
-                </option>
-              ))}
-            </select>
+                  Language
+                </label>
+
+                <FilterDropdown
+                  id="language"
+                  value={selectedLanguage}
+                  onChange={setSelectedLanguage}
+                  options={languageOptions}
+                  placeholder="All Languages"
+                />
+
+              </div>
+
+
+              {/* Country */}
+              <div>
+
+                <label
+                  htmlFor="country"
+                  className="mb-2 block text-xs font-medium uppercase tracking-wider text-zinc-500"
+                >
+                  Country
+                </label>
+
+                <FilterDropdown
+                  id="country"
+                  value={selectedCountry}
+                  onChange={setSelectedCountry}
+                  options={countryOptions}
+                  placeholder="All Countries"
+                />
+
+              </div>
+
+
+              {/* Clear button */}
+              <div className="flex items-end">
+
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white transition hover:border-white/20 hover:bg-white/10"
+                >
+                  Clear Filters
+                </button>
+
+              </div>
+
+
+            </div>
+
           </div>
 
-          <div className="flex items-end">
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="w-full rounded-md bg-zinc-800 px-4 py-3 font-semibold transition hover:bg-zinc-700"
-            >
-              Clear Filters
-            </button>
-          </div>
-        </div>
+        </section>
 
-        {loading && (
-          <p className="mt-10 text-zinc-400">
-            Loading movies...
-          </p>
-        )}
 
-        {error && (
-          <p className="mt-10 rounded-md bg-red-950 p-4 text-red-300">
-            {error}
-          </p>
-        )}
+        {/* Results */}
+        <section className="relative z-0 mt-12">
 
-        {!loading &&
-          !error &&
-          movies.length === 0 && (
-            <p className="mt-10 text-zinc-400">
-              No movies found for these filters.
+
+          {loading && (
+            <p className="text-sm text-zinc-500">
+              Loading movies...
             </p>
           )}
 
-        {!loading &&
-          !error &&
-          movies.length > 0 && (
-            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-              {movies.map((movie) => (
-                <MovieCard
-                  key={movie.id}
-                  movie={movie}
-                />
-              ))}
+
+          {error && (
+            <div className="rounded-lg border border-red-900/50 bg-red-950/30 px-4 py-3">
+
+              <p className="text-sm text-red-300">
+                {error}
+              </p>
+
             </div>
           )}
+
+
+          {!loading &&
+            !error &&
+            movies.length === 0 && (
+
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] px-6 py-12 text-center">
+
+                <p className="text-sm text-zinc-400">
+                  No movies found for these filters.
+                </p>
+
+              </div>
+            )}
+
+
+          {!loading &&
+            !error &&
+            movies.length > 0 && (
+              <>
+
+                <div className="mb-7 flex items-end justify-between">
+
+                  <div>
+
+                    <p className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
+                      Results
+                    </p>
+
+                    <h2 className="mt-2 text-2xl font-semibold tracking-[-0.025em] text-white">
+                      Movies for You
+                    </h2>
+
+                  </div>
+
+                </div>
+
+
+                <div className="grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+
+                  {movies.map((movie) => (
+
+                    <MovieCard
+                      key={movie.id}
+                      movie={movie}
+                    />
+
+                  ))}
+
+                </div>
+
+              </>
+            )}
+
+
+        </section>
+
       </div>
+
     </div>
   );
 }

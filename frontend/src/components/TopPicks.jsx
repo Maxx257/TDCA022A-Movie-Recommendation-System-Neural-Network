@@ -66,8 +66,8 @@ function TopPicks() {
 
   if (loading) {
     return (
-      <section className="px-6 pb-12 md:px-16 lg:px-24">
-        <p className="text-zinc-400">
+      <section className="px-6 py-14 md:px-16 lg:px-24">
+        <p className="text-sm text-zinc-500">
           Loading your recommendations...
         </p>
       </section>
@@ -77,8 +77,8 @@ function TopPicks() {
 
   if (error) {
     return (
-      <section className="px-6 pb-12 md:px-16 lg:px-24">
-        <p className="text-red-400">
+      <section className="px-6 py-14 md:px-16 lg:px-24">
+        <p className="text-sm text-red-400">
           {error}
         </p>
       </section>
@@ -92,29 +92,36 @@ function TopPicks() {
 
 
   return (
-    <section className="px-6 pb-16 md:px-16 lg:px-24">
-      <div className="mb-6">
-        <p className="text-sm font-semibold uppercase tracking-widest text-red-500">
-          Personalized for you
+    <section className="border-t border-white/5 px-6 py-16 md:px-16 lg:px-24">
+
+      <div className="mb-8 max-w-3xl">
+
+        <p className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
+          Personalized for You
         </p>
 
-        <h2 className="mt-2 text-2xl font-bold sm:text-3xl">
+        <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em] text-white sm:text-3xl">
           Top Picks for You
         </h2>
 
-        <p className="mt-1 text-sm text-zinc-400">
+        <p className="mt-2 text-sm leading-6 text-zinc-400">
           Recommendations based on your favourites, ratings and viewing history.
         </p>
+
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+
+      <div className="grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+
         {movies.map((movie) => (
           <MovieCard
             key={movie.id}
             movie={movie}
           />
         ))}
+
       </div>
+
     </section>
   );
 }
