@@ -21,6 +21,7 @@ import Preferences from "./pages/Preferences.jsx";
 import Watchlist from "./pages/Watchlist.jsx";
 import Profile from "./pages/Profile.jsx";
 import Admin from "./pages/Admin.jsx";
+import ModelInsights from "./pages/ModelInsights.jsx";
 
 
 createRoot(
@@ -29,6 +30,7 @@ createRoot(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
+
         <Routes>
 
           <Route
@@ -77,6 +79,11 @@ createRoot(
           />
 
           <Route
+            path="/admin/model-insights"
+            element={<ModelInsights />}
+          />
+
+          <Route
             path="/login"
             element={<Login />}
           />
@@ -87,6 +94,7 @@ createRoot(
           />
 
         </Routes>
+
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>

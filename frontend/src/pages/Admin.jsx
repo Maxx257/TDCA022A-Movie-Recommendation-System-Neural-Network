@@ -37,6 +37,7 @@ function Admin() {
           analyticsResponse,
         ] = await Promise.all([
           apiClient.get("/admin/stats"),
+
           apiClient.get(
             "/admin/movies/analytics",
             {
@@ -48,6 +49,7 @@ function Admin() {
         ]);
 
         setStats(statsResponse.data);
+
 
         const movieRequests =
           analyticsResponse.data.results.map(
@@ -71,15 +73,19 @@ function Admin() {
             }
           );
 
-        const movies = await Promise.all(
-          movieRequests
-        );
+
+        const movies =
+          await Promise.all(
+            movieRequests
+          );
+
 
         setMovieAnalytics(
           movies.filter(
             (item) => item.movie
           )
         );
+
       } catch (err) {
         console.error(
           "Could not load admin statistics:",
@@ -89,12 +95,15 @@ function Admin() {
         setError(
           "Could not load dashboard statistics."
         );
+
       } finally {
         setLoading(false);
       }
     };
 
+
     loadStats();
+
   }, [user, authLoading]);
 
 
@@ -189,7 +198,8 @@ function Admin() {
           </h1>
 
           <p className="mt-3 text-sm leading-6 text-zinc-400 sm:text-base">
-            Overview of platform activity and user interactions.
+            Overview of platform activity, movie interactions
+            and recommendation model performance.
           </p>
 
         </div>
@@ -198,9 +208,11 @@ function Admin() {
         {/* Error */}
         {error && (
           <div className="mt-8 rounded-lg border border-red-900/50 bg-red-950/30 px-4 py-3">
+
             <p className="text-sm text-red-300">
               {error}
             </p>
+
           </div>
         )}
 
@@ -229,6 +241,7 @@ function Admin() {
                   key={card.label}
                   className="rounded-xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-white/20 hover:bg-white/[0.05]"
                 >
+
                   <p className="text-3xl font-semibold tracking-tight text-white">
                     {card.value}
                   </p>
@@ -236,6 +249,7 @@ function Admin() {
                   <p className="mt-2 text-sm text-zinc-500">
                     {card.label}
                   </p>
+
                 </div>
               ))}
 
@@ -243,6 +257,86 @@ function Admin() {
 
           </section>
         )}
+
+
+        {/* Model Insights */}
+        <section className="mt-16 border-t border-white/5 pt-14">
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+
+            <div className="flex flex-col justify-between gap-7 md:flex-row md:items-center">
+
+              <div className="max-w-2xl">
+
+                <p className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
+                  Machine Learning
+                </p>
+
+                <h2 className="mt-3 text-2xl font-semibold tracking-[-0.025em] text-white sm:text-3xl">
+                  Model Insights
+                </h2>
+
+                <p className="mt-3 text-sm leading-6 text-zinc-400">
+                  View the neural recommendation model, dataset
+                  statistics, prediction errors, Top-10 evaluation
+                  metrics and model comparisons.
+                </p>
+
+              </div>
+
+
+              <Link
+                to="/admin/model-insights"
+                className="inline-flex shrink-0 items-center justify-center rounded-lg bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-zinc-200"
+              >
+                View Model Insights
+                <span className="ml-2">
+                  →
+                </span>
+              </Link>
+
+            </div>
+
+
+            <div className="mt-7 grid gap-3 border-t border-white/10 pt-6 sm:grid-cols-3">
+
+              <div>
+                <p className="text-xs uppercase tracking-wider text-zinc-600">
+                  Model
+                </p>
+
+                <p className="mt-2 text-sm font-medium text-white">
+                  NeuMF V2
+                </p>
+              </div>
+
+
+              <div>
+                <p className="text-xs uppercase tracking-wider text-zinc-600">
+                  Framework
+                </p>
+
+                <p className="mt-2 text-sm font-medium text-white">
+                  TensorFlow / Keras
+                </p>
+              </div>
+
+
+              <div>
+                <p className="text-xs uppercase tracking-wider text-zinc-600">
+                  Evaluation
+                </p>
+
+                <p className="mt-2 text-sm font-medium text-white">
+                  MAE · RMSE · HR@10 · NDCG · MRR
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
 
 
         {/* Movie analytics */}
@@ -275,6 +369,7 @@ function Admin() {
                   <thead className="border-b border-white/10 bg-white/[0.03] text-xs uppercase tracking-wider text-zinc-500">
 
                     <tr>
+
                       <th className="px-5 py-4 font-medium">
                         Movie
                       </th>
@@ -298,6 +393,7 @@ function Admin() {
                       <th className="px-4 py-4 font-medium">
                         Total
                       </th>
+
                     </tr>
 
                   </thead>
@@ -337,16 +433,12 @@ function Admin() {
                               <div className="min-w-0">
 
                                 <p className="truncate font-medium text-white">
-                                  {
-                                    item.movie.title
-                                  }
+                                  {item.movie.title}
                                 </p>
 
                                 <p className="mt-1 text-xs text-zinc-500">
-                                  {
-                                    item.movie.year ||
-                                    "Unknown year"
-                                  }
+                                  {item.movie.year ||
+                                    "Unknown year"}
                                 </p>
 
                               </div>
@@ -373,11 +465,11 @@ function Admin() {
                           </td>
 
                           <td className="px-4 py-4">
+
                             <span className="inline-flex min-w-10 justify-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm font-semibold text-white">
-                              {
-                                item.total_interactions
-                              }
+                              {item.total_interactions}
                             </span>
+
                           </td>
 
                         </tr>
@@ -413,6 +505,7 @@ function Admin() {
             <div className="mt-6 grid gap-5 text-sm sm:grid-cols-3">
 
               <div>
+
                 <p className="text-xs uppercase tracking-wider text-zinc-600">
                   Username
                 </p>
@@ -420,10 +513,12 @@ function Admin() {
                 <p className="mt-2 text-zinc-200">
                   {user.username}
                 </p>
+
               </div>
 
 
               <div>
+
                 <p className="text-xs uppercase tracking-wider text-zinc-600">
                   Email
                 </p>
@@ -431,10 +526,12 @@ function Admin() {
                 <p className="mt-2 text-zinc-200">
                   {user.email}
                 </p>
+
               </div>
 
 
               <div>
+
                 <p className="text-xs uppercase tracking-wider text-zinc-600">
                   Role
                 </p>
@@ -442,6 +539,7 @@ function Admin() {
                 <p className="mt-2 font-medium text-white">
                   Administrator
                 </p>
+
               </div>
 
             </div>

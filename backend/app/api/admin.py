@@ -234,3 +234,100 @@ def get_movie_analytics(
     return {
         "results": results[:limit]
     }
+
+@router.get("/model-insights")
+def get_model_insights(
+    current_admin: Annotated[
+        User,
+        Depends(get_current_admin),
+    ],
+):
+    return {
+        "model": {
+            "name": "NeuMF V2",
+            "type": "Neural Collaborative Filtering",
+            "framework": "TensorFlow / Keras",
+            "embedding_dimension": 64,
+            "selection_status": "Selected Model",
+        },
+
+        "dataset": {
+            "name": "MovieLens",
+            "users": 610,
+            "movies": 9716,
+            "ratings": 100823,
+            "training_ratings": 99603,
+            "validation_ratings": 610,
+            "test_ratings": 610,
+            "split_strategy": "Chronological",
+        },
+
+        "performance": {
+            "mae": 0.7563,
+            "rmse": 0.9846,
+            "hit_rate_at_10": 0.3526,
+            "ndcg_at_10": 0.2162,
+            "mrr": 0.1746,
+        },
+
+        "previous_model": {
+            "name": "NCF V1",
+            "mae": 0.7617,
+            "rmse": 0.9868,
+            "hit_rate_at_10": 0.3554,
+            "ndcg_at_10": 0.2144,
+            "mrr": 0.1711,
+        },
+
+        "baselines": [
+            {
+                "name": "Global Mean",
+                "mae": 0.9182,
+                "rmse": 1.1170,
+            },
+            {
+                "name": "User Mean",
+                "mae": 0.7960,
+                "rmse": 1.0277,
+            },
+            {
+                "name": "Movie Mean",
+                "mae": 0.8316,
+                "rmse": 1.0475,
+            },
+            {
+                "name": "User + Movie",
+                "mae": 0.7764,
+                "rmse": 0.9830,
+            },
+        ],
+
+        "explanation": {
+            "mae": (
+                "Average difference between predicted "
+                "and actual user ratings. Lower is better."
+            ),
+            "rmse": (
+                "Measures prediction error while giving "
+                "more weight to larger errors. Lower is better."
+            ),
+            "hit_rate_at_10": (
+                "Percentage of test cases where a relevant "
+                "movie appeared in the top 10 recommendations."
+            ),
+            "ndcg_at_10": (
+                "Measures how well relevant movies are ranked "
+                "near the top of the recommendation list."
+            ),
+            "mrr": (
+                "Measures how early the first relevant movie "
+                "appears in the recommendation ranking."
+            ),
+        },
+
+        "selection_note": (
+            "NeuMF V2 was selected as the final neural model "
+            "because it improved MAE, NDCG@10 and MRR compared "
+            "with the earlier NCF V1 model."
+        ),
+    }
