@@ -19,6 +19,7 @@ import MyList from "./pages/MyList.jsx";
 import Preferences from "./pages/Preferences.jsx";
 import Watchlist from "./pages/Watchlist";
 import Profile from "./pages/Profile.jsx";
+import Admin from "./pages/Admin.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -47,6 +48,10 @@ createRoot(document.getElementById("root")).render(
 <Route
   path="/profile"
   element={<Profile />}
+/>
+<Route
+  path="/admin"
+  element={<Admin />}
 />
         </Routes>
       </AuthProvider>

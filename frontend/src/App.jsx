@@ -84,6 +84,15 @@ useEffect(() => {
   {user.username}
 </Link>
 
+{user?.is_admin && (
+  <Link
+    to="/admin"
+    className="hidden text-sm text-zinc-300 transition hover:text-white md:block"
+  >
+    Admin
+  </Link>
+)}
+
       <button
         onClick={logout}
         className="rounded-md bg-zinc-800 px-5 py-2 text-sm font-semibold transition hover:bg-zinc-700"
