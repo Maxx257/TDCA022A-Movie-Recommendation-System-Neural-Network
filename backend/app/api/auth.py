@@ -125,11 +125,18 @@ def login_user(
         "token_type": "bearer",
     }
 
-@router.get(
-    "/me",
-    response_model=UserResponse,
-)
-def get_logged_in_user(
-    current_user: Annotated[User, Depends(get_current_user)],
+@router.get("/me", response_model=UserResponse)
+def get_me(
+    current_user: Annotated[
+        User,
+        Depends(get_current_user),
+    ],
 ):
-    return current_user
+   return {
+    "id": current_user.id,
+    "username": current_user.username,
+    "email": current_user.email,
+    "is_active": current_user.is_active,
+    "is_admin": current_user.is_admin,
+    "created_at": current_user.created_at,
+}

@@ -12,6 +12,7 @@ from app.api.recommendations import (
     router as recommendations_router,
 )
 from app.api.watchlist import router as watchlist_router
+from app.api.admin import router as admin_router
 
 app = FastAPI(
     title="Movie Recommendation System API",
@@ -40,6 +41,7 @@ app.include_router(ratings_router)
 app.include_router(history_router)
 app.include_router(recommendations_router)
 app.include_router(watchlist_router)
+app.include_router(admin_router)
 
 @app.get("/")
 def root():
