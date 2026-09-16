@@ -18,6 +18,7 @@ import Browse from "./pages/Browse.jsx";
 import MyList from "./pages/MyList.jsx";
 import Preferences from "./pages/Preferences.jsx";
 import Watchlist from "./pages/Watchlist";
+import Profile from "./pages/Profile.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -42,6 +43,10 @@ createRoot(document.getElementById("root")).render(
 <Route
   path="/watchlist"
   element={<Watchlist />}
+/>
+<Route
+  path="/profile"
+  element={<Profile />}
 />
         </Routes>
       </AuthProvider>

@@ -77,9 +77,12 @@ useEffect(() => {
   Watchlist
 </Link>
 
-      <span className="text-sm text-zinc-300">
-        {user.username}
-      </span>
+      <Link
+  to="/profile"
+  className="hidden text-sm text-zinc-300 transition hover:text-white md:block"
+>
+  {user.username}
+</Link>
 
       <button
         onClick={logout}
