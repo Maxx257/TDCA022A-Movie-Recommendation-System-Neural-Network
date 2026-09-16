@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import apiClient from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import MovieCard from "../components/MovieCard";
 
 
 function Profile() {
@@ -18,7 +19,9 @@ function Profile() {
     viewed: 0,
   });
 
-  const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
+    const [recentlyViewed, setRecentlyViewed] = useState([]);
+    const [recentRatings, setRecentRatings] = useState([]);
 
 
   useEffect(() => {
@@ -60,6 +63,86 @@ function Profile() {
           viewed:
             historyResponse.data.length,
         });
+
+        const recentHistoryItems =
+  historyResponse.data.slice(0, 6);
+
+const recentRatingItems =
+  ratingsResponse.data
+    .slice()
+    .sort((a, b) => {
+      const aDate =
+        a.updated_at || a.created_at;
+
+      const bDate =
+        b.updated_at || b.created_at;
+
+      return new Date(bDate) - new Date(aDate);
+    })
+    .slice(0, 6);
+
+    const historyMovieRequests =
+  recentHistoryItems.map(
+    async (item) => {
+      const response = await apiClient.get(
+        `/movies/${item.movie_id}`
+      );
+
+      return {
+        movie: response.data,
+        viewCount: item.view_count,
+      };
+    }
+  );
+
+const ratingMovieRequests =
+  recentRatingItems.map(
+    async (item) => {
+      const response = await apiClient.get(
+        `/movies/${item.movie_id}`
+      );
+
+      return {
+        movie: response.data,
+        rating: item.rating,
+      };
+    }
+  );
+
+  const [
+  historyMovieResponses,
+  ratingMovieResponses,
+] = await Promise.all([
+  Promise.allSettled(
+    historyMovieRequests
+  ),
+  Promise.allSettled(
+    ratingMovieRequests
+  ),
+]);
+
+setRecentlyViewed(
+  historyMovieResponses
+    .filter(
+      (result) =>
+        result.status === "fulfilled"
+    )
+    .map(
+      (result) => result.value
+    )
+);
+
+setRecentRatings(
+  ratingMovieResponses
+    .filter(
+      (result) =>
+        result.status === "fulfilled"
+    )
+    .map(
+      (result) => result.value
+    )
+);
+
       } catch (error) {
         console.error(
           "Could not load profile statistics:",
@@ -210,6 +293,68 @@ function Profile() {
           </div>
         </section>
 
+{recentlyViewed.length > 0 && (
+  <section className="mt-12">
+    <div className="mb-6">
+      <h2 className="text-2xl font-bold">
+        Recently Viewed
+      </h2>
+
+      <p className="mt-1 text-sm text-zinc-400">
+        Movies you recently explored.
+      </p>
+    </div>
+
+    <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+      {recentlyViewed.map(
+        ({ movie, viewCount }) => (
+          <div key={movie.id}>
+            <MovieCard
+              movie={movie}
+            />
+
+            <p className="mt-2 text-xs text-zinc-500">
+              Viewed {viewCount}{" "}
+              {viewCount === 1
+                ? "time"
+                : "times"}
+            </p>
+          </div>
+        )
+      )}
+    </div>
+  </section>
+)}
+
+{recentRatings.length > 0 && (
+  <section className="mt-12">
+    <div className="mb-6">
+      <h2 className="text-2xl font-bold">
+        Recent Ratings
+      </h2>
+
+      <p className="mt-1 text-sm text-zinc-400">
+        Movies you recently rated.
+      </p>
+    </div>
+
+    <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+      {recentRatings.map(
+        ({ movie, rating }) => (
+          <div key={movie.id}>
+            <MovieCard
+              movie={movie}
+            />
+
+            <p className="mt-2 text-sm font-semibold text-yellow-400">
+              Your rating: ★ {rating.toFixed(1)}
+            </p>
+          </div>
+        )
+      )}
+    </div>
+  </section>
+)}
 
         <section className="mt-10">
           <h2 className="text-2xl font-bold">
