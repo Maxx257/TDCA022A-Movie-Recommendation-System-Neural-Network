@@ -11,7 +11,11 @@ from app.models.rating import Rating
 from app.models.user import User
 from app.models.view_history import ViewHistory
 from app.models.watchlist import Watchlist
-from app.schemas.admin import AdminStatsResponse
+from app.schemas.admin import (
+    AdminMovieAnalyticsResponse,
+    AdminStatsResponse,
+)
+from collections import defaultdict
 
 
 router = APIRouter(
@@ -105,4 +109,128 @@ def get_admin_stats(
             if average_rating is not None
             else None
         ),
+    }
+
+@router.get(
+    "/movies/analytics",
+    response_model=AdminMovieAnalyticsResponse,
+)
+def get_movie_analytics(
+    current_admin: Annotated[
+        User,
+        Depends(get_current_admin),
+    ],
+    db: Annotated[
+        Session,
+        Depends(get_db),
+    ],
+    limit: int = 10,
+):
+    movie_stats = defaultdict(
+        lambda: {
+            "favourites": 0,
+            "watchlist": 0,
+            "ratings": 0,
+            "views": 0,
+        }
+    )
+
+    favourite_rows = db.execute(
+        select(
+            Favorite.movie_id,
+            func.count(Favorite.id),
+        )
+        .group_by(Favorite.movie_id)
+    ).all()
+
+    for movie_id, count in favourite_rows:
+        movie_stats[movie_id][
+            "favourites"
+        ] = int(count)
+
+
+    watchlist_rows = db.execute(
+        select(
+            Watchlist.movie_id,
+            func.count(Watchlist.id),
+        )
+        .group_by(Watchlist.movie_id)
+    ).all()
+
+    for movie_id, count in watchlist_rows:
+        movie_stats[movie_id][
+            "watchlist"
+        ] = int(count)
+
+
+    rating_rows = db.execute(
+        select(
+            Rating.movie_id,
+            func.count(Rating.id),
+        )
+        .group_by(Rating.movie_id)
+    ).all()
+
+    for movie_id, count in rating_rows:
+        movie_stats[movie_id][
+            "ratings"
+        ] = int(count)
+
+
+    view_rows = db.execute(
+        select(
+            ViewHistory.movie_id,
+            func.sum(
+                ViewHistory.view_count
+            ),
+        )
+        .group_by(ViewHistory.movie_id)
+    ).all()
+
+    for movie_id, count in view_rows:
+        movie_stats[movie_id][
+            "views"
+        ] = int(count or 0)
+
+
+    results = []
+
+    for movie_id, stats in movie_stats.items():
+        total_interactions = (
+            stats["favourites"]
+            + stats["watchlist"]
+            + stats["ratings"]
+            + stats["views"]
+        )
+
+        results.append(
+            {
+                "movie_id": int(movie_id),
+                "favourites": stats[
+                    "favourites"
+                ],
+                "watchlist": stats[
+                    "watchlist"
+                ],
+                "ratings": stats[
+                    "ratings"
+                ],
+                "views": stats[
+                    "views"
+                ],
+                "total_interactions":
+                    total_interactions,
+            }
+        )
+
+
+    results.sort(
+        key=lambda item:
+            item["total_interactions"],
+        reverse=True,
+    )
+
+
+    return {
+        "results": results[:limit]
     }

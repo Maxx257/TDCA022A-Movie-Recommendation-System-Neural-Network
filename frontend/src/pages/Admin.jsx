@@ -11,6 +11,7 @@ function Admin() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [movieAnalytics, setMovieAnalytics] = useState([]);
 
 
   useEffect(() => {
@@ -25,11 +26,54 @@ function Admin() {
       }
 
       try {
-        const response = await apiClient.get(
-          "/admin/stats"
-        );
+        const [
+  statsResponse,
+  analyticsResponse,
+] = await Promise.all([
+  apiClient.get("/admin/stats"),
+  apiClient.get(
+    "/admin/movies/analytics",
+    {
+      params: {
+        limit: 10,
+      },
+    }
+  ),
+]);
 
-        setStats(response.data);
+setStats(statsResponse.data);
+
+const movieRequests =
+  analyticsResponse.data.results.map(
+    async (item) => {
+      try {
+        const movieResponse =
+          await apiClient.get(
+            `/movies/${item.movie_id}`
+          );
+
+        return {
+          ...item,
+          movie: movieResponse.data,
+        };
+      } catch {
+        return {
+          ...item,
+          movie: null,
+        };
+      }
+    }
+  );
+
+const movies = await Promise.all(
+  movieRequests
+);
+
+setMovieAnalytics(
+  movies.filter(
+    (item) => item.movie
+  )
+);
       } catch (err) {
         console.error(
           "Could not load admin statistics:",
@@ -161,6 +205,125 @@ function Admin() {
           </section>
         )}
 
+{movieAnalytics.length > 0 && (
+  <section className="mt-12">
+    <div className="mb-6">
+      <h2 className="text-2xl font-bold">
+        Movie Analytics
+      </h2>
+
+      <p className="mt-1 text-sm text-zinc-400">
+        Movies with the highest activity across the platform.
+      </p>
+    </div>
+
+    <div className="overflow-hidden rounded-xl border border-zinc-800">
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-sm">
+
+          <thead className="bg-zinc-900 text-zinc-400">
+            <tr>
+              <th className="px-5 py-4">
+                Movie
+              </th>
+
+              <th className="px-4 py-4">
+                Favourites
+              </th>
+
+              <th className="px-4 py-4">
+                Watchlist
+              </th>
+
+              <th className="px-4 py-4">
+                Ratings
+              </th>
+
+              <th className="px-4 py-4">
+                Views
+              </th>
+
+              <th className="px-4 py-4">
+                Total
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {movieAnalytics.map(
+              (item, index) => (
+                <tr
+                  key={item.movie_id}
+                  className="border-t border-zinc-800 bg-zinc-950/50"
+                >
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-4">
+
+                      <span className="w-5 text-zinc-500">
+                        {index + 1}
+                      </span>
+
+                      {item.movie.poster_url && (
+                        <img
+                          src={
+                            item.movie.poster_url
+                          }
+                          alt={
+                            item.movie.title
+                          }
+                          className="h-16 w-11 rounded object-cover"
+                        />
+                      )}
+
+                      <div>
+                        <p className="font-semibold text-white">
+                          {
+                            item.movie.title
+                          }
+                        </p>
+
+                        <p className="text-xs text-zinc-500">
+                          {
+                            item.movie.year ||
+                            "Unknown year"
+                          }
+                        </p>
+                      </div>
+
+                    </div>
+                  </td>
+
+                  <td className="px-4 py-4">
+                    {item.favourites}
+                  </td>
+
+                  <td className="px-4 py-4">
+                    {item.watchlist}
+                  </td>
+
+                  <td className="px-4 py-4">
+                    {item.ratings}
+                  </td>
+
+                  <td className="px-4 py-4">
+                    {item.views}
+                  </td>
+
+                  <td className="px-4 py-4 font-bold text-red-500">
+                    {
+                      item.total_interactions
+                    }
+                  </td>
+                </tr>
+              )
+            )}
+          </tbody>
+
+        </table>
+      </div>
+    </div>
+  </section>
+)}
 
         <section className="mt-12 rounded-xl border border-zinc-800 bg-zinc-900/70 p-6">
           <h2 className="text-xl font-bold">
